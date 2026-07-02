@@ -2,14 +2,15 @@ import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 
-// Modèle utilisé pour la génération. flux/schnell = rapide et très bon marché
-// (idéal pour démarrer). Pour une qualité supérieure une fois que le budget
-// le permet, remplace par "fal-ai/flux-pro/v1.1".
-const FAL_MODEL = "fal-ai/flux/schnell";
+// Sans image de référence : Flux Dev (meilleure qualité que Schnell, toujours abordable).
+const FAL_TEXT_MODEL = "fal-ai/flux/dev";
+// Avec image de référence : Kontext, conçu pour transformer une image existante
+// en respectant sa composition — bien plus fidèle qu'un prompt texte seul.
+const FAL_KONTEXT_MODEL = "fal-ai/flux-pro/kontext";
 
 export async function POST(req: Request) {
   try {
-    const { prompt, format } = await req.json();
+    const { prompt, format, imageDataUrl } = await req.json();
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return NextResponse.json({ error: "Aucune description reçue." }, { status: 400 });
@@ -23,25 +24,41 @@ export async function POST(req: Request) {
       );
     }
 
-    // Format d'image adapté à TikTok (portrait) ou YouTube (paysage)
     const imageSize = format === "youtube" ? "landscape_16_9" : "portrait_16_9";
+    const stylePrompt = `${prompt.trim()}, miniature gaming accrocheuse, style clickbait, couleurs vives, texte lisible, haute qualité, éclairage dramatique`;
 
-    // On enrichit légèrement le prompt pour coller au style miniature gaming
-    const fullPrompt = `${prompt.trim()}, miniature gaming accrocheuse, style clickbait, couleurs vives, texte lisible, haute qualité, éclairage dramatique`;
+    let response: Response;
 
-    const response = await fetch(`https://fal.run/${FAL_MODEL}`, {
-      method: "POST",
-      headers: {
-        Authorization: `Key ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        prompt: fullPrompt,
-        image_size: imageSize,
-        num_images: 1,
-        enable_safety_checker: true,
-      }),
-    });
+    if (imageDataUrl && typeof imageDataUrl === "string") {
+      // Mode "image de référence" : Kontext transforme l'image fournie
+      response = await fetch(`https://fal.run/${FAL_KONTEXT_MODEL}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: stylePrompt,
+          image_url: imageDataUrl,
+          aspect_ratio: format === "youtube" ? "16:9" : "9:16",
+        }),
+      });
+    } else {
+      // Mode texte seul
+      response = await fetch(`https://fal.run/${FAL_TEXT_MODEL}`, {
+        method: "POST",
+        headers: {
+          Authorization: `Key ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          prompt: stylePrompt,
+          image_size: imageSize,
+          num_images: 1,
+          enable_safety_checker: true,
+        }),
+      });
+    }
 
     if (!response.ok) {
       const errText = await response.text();
@@ -56,10 +73,7 @@ export async function POST(req: Request) {
     const imageUrl = data?.images?.[0]?.url;
 
     if (!imageUrl) {
-      return NextResponse.json(
-        { error: "Aucune image générée." },
-        { status: 502 }
-      );
+      return NextResponse.json({ error: "Aucune image générée." }, { status: 502 });
     }
 
     return NextResponse.json({ url: imageUrl });
@@ -68,3 +82,4 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Erreur interne du serveur." }, { status: 500 });
   }
 }
+
