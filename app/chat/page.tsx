@@ -7,10 +7,10 @@ import "./chat.css";
 type Msg = { role: "user" | "assistant"; content: string };
 
 const SUGGESTIONS = [
-  "Explique-moi un sujet complexe simplement",
-  "Aide-moi à rédiger un message professionnel",
-  "Résous ce problème avec moi étape par étape",
-  "Donne-moi des idées pour mon projet",
+  "Comment améliorer ma précision sur Free Fire ?",
+  "Comment faire des headshots sur Call of Duty Mobile ?",
+  "Donne-moi 5 idées de vidéos TikTok gaming",
+  "Écris-moi un script pour une vidéo sur PUBG Mobile",
 ];
 
 export default function ChatPage() {
@@ -97,8 +97,8 @@ export default function ChatPage() {
           {messages.length === 0 && (
             <div className="chat-empty">
               <div className="chat-empty-icon">✦</div>
-              <h2>Comment puis-je vous aider ?</h2>
-              <p>Posez n'importe quelle question — je fais de mon mieux pour vous donner une vraie réponse.</p>
+              <h2>Prêt à progresser ?</h2>
+              <p>Astuces, stratégies, histoire des jeux ou scripts vidéo — demande-moi ce que tu veux.</p>
               <div className="chat-suggestions">
                 {SUGGESTIONS.map((s) => (
                   <button key={s} onClick={() => send(s)} className="chat-suggestion">

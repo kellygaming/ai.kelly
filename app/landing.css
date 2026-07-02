@@ -425,6 +425,101 @@ img{ max-width:100%; display:block; }
 .ai-5{ bottom:12%; left:6%; animation-delay:1.8s; font-size:24px; }
 
 /* ==========================================================
+   SCRIPT SECTION (générateur de scripts vidéo)
+   ========================================================== */
+.script-section{
+  position:relative; z-index:1;
+  padding:100px 20px 120px;
+  background:var(--bg-1);
+  overflow:hidden;
+}
+.script-glow{
+  position:absolute; top:20%; right:-10%; width:700px; height:500px;
+  background:radial-gradient(ellipse, rgba(75,125,255,.16), transparent 65%);
+  filter:blur(10px);
+}
+.script-inner{ position:relative; z-index:1; max-width:1080px; margin:0 auto; }
+.script-heading{ text-align:center; max-width:600px; margin:0 auto 56px; }
+
+.script-console{
+  display:grid; grid-template-columns:1.5fr 1fr; gap:24px; align-items:start;
+}
+@media (max-width:860px){ .script-console{ grid-template-columns:1fr; } }
+
+.script-card{
+  background:linear-gradient(180deg, rgba(23,23,36,.9), rgba(14,14,24,.9));
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:var(--radius-lg);
+  backdrop-filter:blur(16px);
+  box-shadow:0 30px 80px -25px rgba(75,125,255,.3);
+  padding:22px;
+}
+.script-top{ display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+.script-format-toggle{
+  display:flex; gap:6px; padding:4px; border-radius:999px;
+  background:rgba(255,255,255,.04); border:1px solid var(--border);
+}
+.format-chip{
+  padding:6px 14px; border-radius:999px; font-size:12px; font-weight:600;
+  color:var(--text-3); transition:all .25s var(--ease);
+}
+.format-chip.active{
+  background:var(--grad-violet); color:#fff;
+  box-shadow:0 4px 14px -4px rgba(164,75,255,.6);
+}
+.script-duration{ font-family:'JetBrains Mono', monospace; font-size:12px; color:var(--text-3); }
+
+.script-topic{
+  display:flex; align-items:center; gap:8px; flex-wrap:wrap;
+  padding:12px 14px; border-radius:12px;
+  background:rgba(75,125,255,.06); border:1px solid rgba(75,125,255,.2);
+  margin-bottom:20px;
+  min-height:20px;
+}
+.script-topic-label{
+  font-size:10.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--blue-light); font-weight:600; flex-shrink:0;
+}
+.script-topic-text{ font-family:'JetBrains Mono', monospace; font-size:13px; color:var(--text); }
+
+.script-timeline{ display:flex; flex-direction:column; gap:12px; }
+.script-beat{
+  padding:14px 16px; border-radius:12px;
+  background:rgba(255,255,255,.02);
+  border-left:3px solid var(--border);
+}
+.script-beat p{ font-size:13px; color:var(--text-2); line-height:1.5; }
+.beat-head{ display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+.beat-time{ font-family:'JetBrains Mono', monospace; font-size:11px; color:var(--text-3); }
+.beat-tag{ font-size:10.5px; font-weight:600; padding:2px 9px; border-radius:999px; }
+.beat-hook{ border-left-color:var(--pink); }
+.beat-tag-hook{ background:rgba(255,79,216,.15); color:var(--pink); }
+.beat-body{ border-left-color:var(--violet); }
+.beat-tag-body{ background:rgba(164,75,255,.15); color:var(--violet-light); }
+.beat-cta{ border-left-color:var(--blue); }
+.beat-tag-cta{ background:rgba(75,125,255,.15); color:var(--blue-light); }
+
+.script-ideas{
+  display:flex; flex-direction:column; gap:12px;
+  padding-top:8px;
+}
+.script-ideas-label{
+  font-size:11.5px; text-transform:uppercase; letter-spacing:.06em;
+  color:var(--text-3); font-weight:600; margin-bottom:4px;
+}
+.idea-chip{
+  padding:14px 16px; border-radius:14px;
+  background:rgba(23,23,36,.7); border:1px solid var(--border);
+  font-size:13px; color:var(--text-2);
+  backdrop-filter:blur(6px);
+  animation:card-float 5s ease-in-out infinite;
+  box-shadow:0 14px 34px -18px rgba(0,0,0,.6);
+}
+.idea-1{ animation-delay:0s; }
+.idea-2{ animation-delay:.7s; }
+.idea-3{ animation-delay:1.4s; }
+
+/* ==========================================================
    PRODUCTS
    ========================================================== */
 .products-section{ position:relative; z-index:1; padding:120px 20px; }

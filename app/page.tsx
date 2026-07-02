@@ -104,13 +104,13 @@ export default function Home() {
       }
     }
 
-    // ===== Effet "machine à écrire" pour le prompt IA =====
+    // ===== Effet "machine à écrire" pour le prompt IA (miniatures) =====
     const promptText = document.getElementById("promptText");
     if (promptText) {
       const prompts = [
-        "un marché africain vibrant au coucher du soleil",
-        "un logo moderne pour ma startup",
-        "une illustration futuriste d'Abidjan",
+        "miniature Free Fire avec un headshot explosif",
+        "thumbnail PUBG Mobile style clickbait",
+        "miniature COD Mobile néon et texte choc",
       ];
       let promptIndex = 0;
 
@@ -148,6 +148,51 @@ export default function Home() {
 
       typePrompt();
     }
+
+    // ===== Effet "machine à écrire" pour le sujet du script vidéo =====
+    const scriptTopic = document.getElementById("scriptTopic");
+    if (scriptTopic) {
+      const topics = [
+        "5 astuces pour viser comme un pro sur Free Fire",
+        "Le meilleur loadout COD Mobile de la saison",
+        "3 erreurs qui te font perdre sur PUBG Mobile",
+      ];
+      let topicIndex = 0;
+
+      function typeTopic() {
+        if (cancelled || !scriptTopic) return;
+        const text = topics[topicIndex];
+        let charIndex = 0;
+        scriptTopic.textContent = "";
+
+        function typeChar() {
+          if (cancelled || !scriptTopic) return;
+          if (charIndex <= text.length) {
+            scriptTopic.textContent = text.slice(0, charIndex);
+            charIndex++;
+            setTimeout(typeChar, 40);
+          } else {
+            setTimeout(eraseTopic, 2400);
+          }
+        }
+
+        function eraseTopic() {
+          if (cancelled || !scriptTopic) return;
+          if (charIndex >= 0) {
+            scriptTopic.textContent = text.slice(0, charIndex);
+            charIndex--;
+            setTimeout(eraseTopic, 20);
+          } else {
+            topicIndex = (topicIndex + 1) % topics.length;
+            setTimeout(typeTopic, 450);
+          }
+        }
+
+        typeChar();
+      }
+
+      typeTopic();
+    }
     cleanupFns.push(() => {
       cancelled = true;
     });
@@ -170,7 +215,7 @@ export default function Home() {
       `;
       const links: Array<[string, string]> = [
         ["Fonctionnalités", "#fonctionnalites"],
-        ["IA", "#ia"],
+        ["Studio créateur", "#ia"],
         ["Tarifs", "#tarifs"],
         ["Avis", "#avis"],
         ["FAQ", "#faq"],
@@ -211,7 +256,7 @@ export default function Home() {
           </Link>
           <nav className="nav-links">
             <a href="#fonctionnalites">Fonctionnalités</a>
-            <a href="#ia">Génération d'images</a>
+            <a href="#ia">Studio créateur</a>
             <a href="#tarifs">Tarifs</a>
             <a href="#avis">Avis</a>
             <a href="#faq">FAQ</a>
@@ -254,14 +299,14 @@ export default function Home() {
           <div className="hero-copy reveal">
             <span className="eyebrow">
               <span className="eyebrow-dot"></span>
-              L'IA conçue pour l'Afrique
+              L'IA 100% gaming, faite pour l'Afrique
             </span>
             <h1 className="hero-title">
-              Posez la question.<br />
-              <span className="grad-text">Obtenez la réponse.</span>
+              Deviens plus fort.<br />
+              <span className="grad-text">Crée plus vite.</span>
             </h1>
             <p className="hero-sub">
-              Discutez, résolvez des problèmes complexes et générez des images en quelques secondes.
+              Astuces Free Fire, PUBG Mobile, Call of Duty et plus — plus miniatures et scripts pour tes vidéos.
               Sans carte bancaire : payez avec Wave, Orange Money ou MTN Mobile Money.
             </p>
             <div className="hero-actions">
@@ -269,10 +314,10 @@ export default function Home() {
                 Commencer gratuitement
                 <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
               </Link>
-              <a href="#ia" className="btn btn-ghost btn-lg">Voir l'IA en action</a>
+              <a href="#ia" className="btn btn-ghost btn-lg">Voir le studio créateur</a>
             </div>
             <div className="hero-trust">
-              <div className="trust-item"><strong>50K+</strong><span>Questions résolues</span></div>
+              <div className="trust-item"><strong>50K+</strong><span>Astuces données</span></div>
               <div className="trust-divider"></div>
               <div className="trust-item"><strong>&lt; 3s</strong><span>Temps de réponse</span></div>
               <div className="trust-divider"></div>
@@ -291,8 +336,8 @@ export default function Home() {
                 <div className="orb-star s3"></div>
               </div>
               <div className="orb-card oc-1">
-                <span className="oc-icon">💬</span>
-                <div><strong>Réponse claire</strong><small>en 3 secondes</small></div>
+                <span className="oc-icon">🎯</span>
+                <div><strong>Combo débloqué</strong><small>en 3 secondes</small></div>
               </div>
               <div className="orb-card oc-2">
                 <span className="oc-icon">✓</span>
@@ -300,7 +345,7 @@ export default function Home() {
               </div>
               <div className="orb-card oc-3">
                 <span className="oc-icon">🖼️</span>
-                <div><strong>Image générée</strong><small>à l'instant</small></div>
+                <div><strong>Miniature créée</strong><small>à l'instant</small></div>
               </div>
             </div>
           </div>
@@ -316,12 +361,12 @@ export default function Home() {
       <section className="marquee-section">
         <div className="marquee">
           <div className="marquee-track">
-            <span>Chat intelligent</span><span>•</span><span>Génération d'images</span><span>•</span>
-            <span>Résolution de problèmes</span><span>•</span><span>Rédaction</span><span>•</span>
-            <span>Code</span><span>•</span><span>Traduction</span><span>•</span>
-            <span>Chat intelligent</span><span>•</span><span>Génération d'images</span><span>•</span>
-            <span>Résolution de problèmes</span><span>•</span><span>Rédaction</span><span>•</span>
-            <span>Code</span><span>•</span><span>Traduction</span><span>•</span>
+            <span>Free Fire</span><span>•</span><span>PUBG Mobile</span><span>•</span>
+            <span>Call of Duty Mobile</span><span>•</span><span>Fortnite</span><span>•</span>
+            <span>Miniatures</span><span>•</span><span>Scripts vidéo</span><span>•</span>
+            <span>Free Fire</span><span>•</span><span>PUBG Mobile</span><span>•</span>
+            <span>Call of Duty Mobile</span><span>•</span><span>Fortnite</span><span>•</span>
+            <span>Miniatures</span><span>•</span><span>Scripts vidéo</span><span>•</span>
           </div>
         </div>
       </section>
@@ -345,12 +390,12 @@ export default function Home() {
           <div className="ia-heading reveal">
             <span className="eyebrow eyebrow-purple">
               <span className="eyebrow-dot dot-purple"></span>
-              Propulsé par l'intelligence artificielle
+              Studio créateur gaming
             </span>
-            <h2 className="section-title">Crée tes images<br /><span className="grad-text-2">avec l'IA</span></h2>
+            <h2 className="section-title">Crée tes miniatures<br /><span className="grad-text-2">qui font exploser tes vues</span></h2>
             <p className="section-sub">
-              Génère des visuels ultra réalistes en quelques secondes.
-              Décris ton idée, l'IA fait le reste.
+              Génère des miniatures percutantes au format TikTok ou YouTube.
+              Décris ta vidéo, l'IA fait le reste.
             </p>
           </div>
 
@@ -360,7 +405,7 @@ export default function Home() {
             <div className="console-card">
               <div className="console-top">
                 <div className="console-dots"><span></span><span></span><span></span></div>
-                <span className="console-label">kellyia.ai — génération en direct</span>
+                <span className="console-label">kellyia.ai — miniatures en direct</span>
                 <span className="console-status"><span className="status-dot"></span>En ligne</span>
               </div>
 
@@ -390,8 +435,8 @@ export default function Home() {
 
               <div className="console-footer">
                 <div className="mini-stat"><strong>2.4s</strong><small>Temps moyen</small></div>
-                <div className="mini-stat"><strong>4K</strong><small>Résolution</small></div>
-                <div className="mini-stat"><strong>∞</strong><small>Styles</small></div>
+                <div className="mini-stat"><strong>9:16</strong><small>Format TikTok</small></div>
+                <div className="mini-stat"><strong>16:9</strong><small>Format YouTube</small></div>
               </div>
             </div>
 
@@ -404,51 +449,107 @@ export default function Home() {
               <div className="holo-ripple"></div>
             </div>
 
-            <div className="ia-badge badge-1">IA générative</div>
-            <div className="ia-badge badge-2">Ultra réaliste</div>
+            <div className="ia-badge badge-1">Formats TikTok & YouTube</div>
+            <div className="ia-badge badge-2">Textes accrocheurs</div>
             <div className="ia-badge badge-3">Temps réel</div>
           </div>
         </div>
       </section>
 
-      {/* FONCTIONNALITÉS */}
+      {/* SCRIPTS VIDÉO */}
+      <section className="script-section" id="scripts">
+        <div className="script-glow"></div>
+        <div className="script-inner">
+          <div className="script-heading reveal">
+            <span className="eyebrow eyebrow-purple">
+              <span className="eyebrow-dot dot-purple"></span>
+              Studio créateur gaming
+            </span>
+            <h2 className="section-title">Écris ton script<br /><span className="grad-text-2">en un clic</span></h2>
+            <p className="section-sub">
+              Donne un sujet, l'IA structure ton script YouTube ou TikTok :
+              accroche, contenu, appel à l'action.
+            </p>
+          </div>
+
+          <div className="script-console reveal" style={{transitionDelay: '.1s'}}>
+            <div className="script-card">
+              <div className="script-top">
+                <div className="script-format-toggle">
+                  <span className="format-chip active">TikTok</span>
+                  <span className="format-chip">YouTube</span>
+                </div>
+                <span className="script-duration">⏱ 0:45</span>
+              </div>
+
+              <div className="script-topic">
+                <span className="script-topic-label">Sujet</span>
+                <span className="script-topic-text" id="scriptTopic"></span>
+                <span className="prompt-cursor">▍</span>
+              </div>
+
+              <div className="script-timeline">
+                <div className="script-beat beat-hook">
+                  <div className="beat-head"><span className="beat-time">0:00–0:03</span><span className="beat-tag beat-tag-hook">Accroche</span></div>
+                  <p>"Voici l'erreur qui te fait perdre CHAQUE partie sur Free Fire..."</p>
+                </div>
+                <div className="script-beat beat-body">
+                  <div className="beat-head"><span className="beat-time">0:03–0:30</span><span className="beat-tag beat-tag-body">Contenu</span></div>
+                  <p>3 astuces concrètes de sensibilité et de rotation, démontrées à l'écran.</p>
+                </div>
+                <div className="script-beat beat-cta">
+                  <div className="beat-head"><span className="beat-time">0:30–0:45</span><span className="beat-tag beat-tag-cta">Appel à l'action</span></div>
+                  <p>"Abonne-toi pour le prochain combo qui va tout changer."</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="script-ideas">
+              <span className="script-ideas-label">Idées de sujets suggérées</span>
+              <div className="idea-chip idea-1">🔥 Top 5 sensibilités Free Fire</div>
+              <div className="idea-chip idea-2">🎯 3 astuces headshot COD Mobile</div>
+              <div className="idea-chip idea-3">🕹️ L'histoire méconnue de PUBG</div>
+            </div>
+          </div>
+        </div>
+      </section>
       <section className="products-section" id="fonctionnalites">
-        <div className="ambient-icon ai-1">💬</div>
+        <div className="ambient-icon ai-1">🎮</div>
         <div className="ambient-icon ai-2">🖼️</div>
         <div className="ambient-icon ai-3">✍️</div>
         <div className="section-head reveal">
           <span className="eyebrow"><span className="eyebrow-dot"></span>Ce que vous pouvez faire</span>
-          <h2 className="section-title">Une IA, toutes les réponses</h2>
-          <p className="section-sub">Un seul assistant pour discuter, résoudre, créer et écrire.</p>
+          <h2 className="section-title">Une IA, 100% gaming</h2>
+          <p className="section-sub">Coaching, culture gaming et création de contenu, dans un seul assistant.</p>
         </div>
 
         <div className="products-grid">
           <div className="product-card reveal" style={{transitionDelay: '.05s'}}>
             <div className="product-glow pg-orange"></div>
-            <div className="product-icon">💬</div>
-            <h3>Chat intelligent</h3>
-            <p>Posez n'importe quelle question, obtenez une réponse claire et sourcée.</p>
+            <div className="product-icon">🎮</div>
+            <h3>Coaching gaming</h3>
+            <p>Astuces et stratégies pour Free Fire, PUBG Mobile, Call of Duty Mobile et plus.</p>
             <div className="product-meta"><span>Gratuit pour commencer</span><span className="tag">Populaire</span></div>
           </div>
           <div className="product-card reveal" style={{transitionDelay: '.1s'}}>
             <div className="product-glow pg-red"></div>
-            <div className="product-icon">🧠</div>
-            <h3>Problèmes complexes</h3>
-            <p>Maths, droit, business, technique — l'IA raisonne étape par étape avec vous.</p>
+            <div className="product-icon">📜</div>
+            <h3>Histoire & culture gaming</h3>
+            <p>L'histoire de tes jeux préférés, mises à jour, lore et actu esport.</p>
             <div className="product-meta"><span>Illimité en abonnement</span></div>
           </div>
           <div className="product-card reveal" style={{transitionDelay: '.15s'}}>
             <div className="product-glow pg-blue"></div>
             <div className="product-icon">🖼️</div>
-            <h3>Génération d'images</h3>
-            <p>Décrivez une image, l'IA la crée en quelques secondes.</p>
+            <h3>Miniatures TikTok / YouTube</h3>
+            <p>Génère des miniatures qui donnent vraiment envie de cliquer.</p>
             <div className="product-meta"><span>Dès l'offre Plus</span></div>
           </div>
           <div className="product-card reveal" style={{transitionDelay: '.2s'}}>
             <div className="product-glow pg-purple"></div>
             <div className="product-icon">✍️</div>
-            <h3>Rédaction & code</h3>
-            <p>Emails, documents, scripts — rédigés et corrigés en un instant.</p>
+            <h3>Scripts vidéo</h3>
+            <p>Scripts prêts à tourner pour tes vidéos et shorts gaming.</p>
             <div className="product-meta"><span>Inclus dans tous les plans</span></div>
           </div>
         </div>
@@ -466,8 +567,8 @@ export default function Home() {
         <div className="why-grid">
           <div className="why-card reveal">
             <div className="why-icon">⚡</div>
-            <h3>Réponses instantanées</h3>
-            <p>Une réponse claire en quelques secondes, 24h/24, où que vous soyez.</p>
+            <h3>Coaching instantané</h3>
+            <p>Une astuce, une stratégie ou un script en quelques secondes, 24h/24.</p>
           </div>
           <div className="why-card reveal" style={{transitionDelay: '.08s'}}>
             <div className="why-icon">📲</div>
@@ -503,7 +604,7 @@ export default function Home() {
               <div className="price-amount">0 <small>FCFA</small></div>
               <p className="price-desc">Pour découvrir l'assistant au quotidien.</p>
               <ul className="price-list">
-                <li>Chat illimité</li>
+                <li>Coaching gaming illimité</li>
                 <li>Réponses rapides</li>
                 <li>Historique 7 jours</li>
               </ul>
@@ -514,9 +615,9 @@ export default function Home() {
               <div className="price-amount">2 500 <small>FCFA / mois</small></div>
               <p className="price-desc">Pour ceux qui veulent tout, sans limite.</p>
               <ul className="price-list">
-                <li>Chat illimité et prioritaire</li>
-                <li>Génération d'images illimitée</li>
-                <li>Résolution de problèmes avancés</li>
+                <li>Coaching prioritaire illimité</li>
+                <li>Miniatures TikTok / YouTube illimitées</li>
+                <li>Scripts vidéo illimités</li>
                 <li>Historique illimité</li>
               </ul>
               <Link href="/chat" className="btn btn-primary price-btn">S'abonner</Link>
@@ -541,15 +642,15 @@ export default function Home() {
         <div className="stats-grid">
           <div className="stat reveal">
             <strong className="stat-num" data-target="50000">0</strong>
-            <span>Questions résolues</span>
+            <span>Astuces données</span>
           </div>
           <div className="stat reveal" style={{transitionDelay: '.06s'}}>
             <strong className="stat-num" data-target="12000">0</strong>
-            <span>Images générées</span>
+            <span>Miniatures créées</span>
           </div>
           <div className="stat reveal" style={{transitionDelay: '.12s'}}>
-            <strong className="stat-num" data-target="99">0</strong>
-            <span>% de disponibilité</span>
+            <strong className="stat-num" data-target="8000">0</strong>
+            <span>Scripts générés</span>
           </div>
           <div className="stat reveal" style={{transitionDelay: '.18s'}}>
             <strong className="stat-num" data-target="3">0</strong>
@@ -568,20 +669,20 @@ export default function Home() {
         <div className="steps">
           <div className="step reveal">
             <span className="step-num">01</span>
-            <h3>Posez votre question</h3>
-            <p>Écrivez librement, comme à un ami — l'IA comprend le contexte.</p>
+            <h3>Pose ta question gaming</h3>
+            <p>Astuce, stratégie ou histoire d'un jeu — demande librement.</p>
           </div>
           <div className="step-connector"></div>
           <div className="step reveal" style={{transitionDelay: '.08s'}}>
             <span className="step-num">02</span>
-            <h3>Obtenez une réponse</h3>
-            <p>Réponse claire en quelques secondes, avec explications si besoin.</p>
+            <h3>Reçois ta réponse</h3>
+            <p>Conseils clairs et actionnables en quelques secondes.</p>
           </div>
           <div className="step-connector"></div>
           <div className="step reveal" style={{transitionDelay: '.16s'}}>
             <span className="step-num">03</span>
-            <h3>Passez à l'offre Plus</h3>
-            <p>Débloquez la génération d'images et le mode avancé.</p>
+            <h3>Crée du contenu</h3>
+            <p>Génère miniatures et scripts pour tes vidéos.</p>
           </div>
           <div className="step-connector"></div>
           <div className="step reveal" style={{transitionDelay: '.24s'}}>
@@ -602,17 +703,17 @@ export default function Home() {
         <div className="reviews-grid">
           <div className="review-card reveal">
             <div className="stars">★★★★★</div>
-            <p>"J'ai enfin une IA qui répond vite et que je peux payer avec mon Wave, sans galère de carte bancaire."</p>
+            <p>"Grâce aux astuces de sensibilité, j'ai enfin débloqué le rang Héroïque sur Free Fire."</p>
             <div className="review-author"><span className="avatar">KA</span><div><strong>Kouassi A.</strong><small>Abidjan</small></div></div>
           </div>
           <div className="review-card reveal" style={{transitionDelay: '.08s'}}>
             <div className="stars">★★★★★</div>
-            <p>"J'utilise KellyIA pour rédiger mes rapports et générer des visuels pour mon business. Un gain de temps énorme."</p>
+            <p>"Je génère mes miniatures et mes scripts TikTok en 5 minutes chrono. Ma chaîne a explosé."</p>
             <div className="review-author"><span className="avatar">MD</span><div><strong>Mariam D.</strong><small>Bouaké</small></div></div>
           </div>
           <div className="review-card reveal" style={{transitionDelay: '.16s'}}>
             <div className="stars">★★★★★</div>
-            <p>"Le paiement MTN Mobile Money a été instantané. Enfin un outil pensé pour nous."</p>
+            <p>"Le paiement MTN Mobile Money a été instantané. Enfin un outil pensé pour les créateurs gaming africains."</p>
             <div className="review-author"><span className="avatar">YS</span><div><strong>Yao S.</strong><small>San-Pédro</small></div></div>
           </div>
         </div>
@@ -628,6 +729,13 @@ export default function Home() {
         <div className="faq-list reveal">
           <div className="faq-item">
             <button className="faq-q">
+              <span>Quels jeux KellyIA couvre-t-il ?</span>
+              <span className="faq-plus">+</span>
+            </button>
+            <div className="faq-a"><p>Free Fire, PUBG Mobile, Call of Duty Mobile, Fortnite et les principaux jeux mobiles et populaires en Afrique — avec du contenu enrichi en continu.</p></div>
+          </div>
+          <div className="faq-item">
+            <button className="faq-q">
               <span>Ai-je besoin d'une carte bancaire ?</span>
               <span className="faq-plus">+</span>
             </button>
@@ -638,7 +746,7 @@ export default function Home() {
               <span>La version gratuite suffit-elle ?</span>
               <span className="faq-plus">+</span>
             </button>
-            <div className="faq-a"><p>Oui pour un usage quotidien de chat. L'offre Plus débloque la génération d'images illimitée et la résolution de problèmes avancés.</p></div>
+            <div className="faq-a"><p>Oui pour un usage quotidien de coaching. L'offre Plus débloque les miniatures et scripts vidéo en illimité.</p></div>
           </div>
           <div className="faq-item">
             <button className="faq-q">
@@ -661,8 +769,8 @@ export default function Home() {
       <section className="cta-section">
         <div className="cta-glow"></div>
         <div className="cta-inner reveal">
-          <h2>Prêt à obtenir des réponses ?</h2>
-          <p>Rejoignez des milliers d'Africains qui utilisent KellyIA au quotidien.</p>
+          <h2>Prêt à passer au niveau supérieur ?</h2>
+          <p>Rejoins des milliers de gamers et créateurs africains qui progressent avec KellyIA.</p>
           <Link href="/chat" className="btn btn-primary btn-lg">Commencer maintenant</Link>
         </div>
       </section>
@@ -672,14 +780,14 @@ export default function Home() {
         <div className="footer-top">
           <div className="footer-brand">
             <Link href="/" className="logo"><span className="logo-mark"></span>KellyIA</Link>
-            <p>L'intelligence artificielle pensée pour l'Afrique francophone.</p>
+            <p>L'IA gaming et créateur, pensée pour l'Afrique francophone.</p>
           </div>
           <div className="footer-col">
             <h4>Produit</h4>
-            <a href="#fonctionnalites">Chat intelligent</a>
-            <a href="#ia">Génération d'images</a>
+            <a href="#fonctionnalites">Coaching gaming</a>
+            <a href="#ia">Miniatures TikTok / YouTube</a>
             <a href="#tarifs">Tarifs</a>
-            <a href="#fonctionnalites">Rédaction & code</a>
+            <a href="#fonctionnalites">Scripts vidéo</a>
           </div>
           <div className="footer-col">
             <h4>Entreprise</h4>
