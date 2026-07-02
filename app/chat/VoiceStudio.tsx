@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const VOICES = [
   { id: "kelly", name: "Kelly", tag: "Énergique · Homme", emoji: "🎙️" },
@@ -12,20 +12,81 @@ const VOICES = [
 export default function VoiceStudio() {
   const [text, setText] = useState("");
   const [voice, setVoice] = useState(VOICES[0].id);
-  const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
+  const [error, setError] = useState("");
   const [playing, setPlaying] = useState(false);
+  const [duration, setDuration] = useState("0:00");
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const objectUrlRef = useRef<string | null>(null);
 
-  function generate() {
+  useEffect(() => {
+    return () => {
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+    };
+  }, []);
+
+  async function generate() {
     if (!text.trim() || status === "loading") return;
     setStatus("loading");
+    setError("");
     setPlaying(false);
-    setTimeout(() => setStatus("done"), 1400);
+
+    try {
+      const res = await fetch("/api/generate-voice", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, voiceKey: voice }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        setError(data?.error || "Une erreur est survenue.");
+        setStatus("error");
+        return;
+      }
+
+      const blob = await res.blob();
+      if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
+      const url = URL.createObjectURL(blob);
+      objectUrlRef.current = url;
+
+      if (audioRef.current) {
+        audioRef.current.src = url;
+        audioRef.current.onloadedmetadata = () => {
+          const d = audioRef.current?.duration || 0;
+          const m = Math.floor(d / 60);
+          const s = Math.floor(d % 60).toString().padStart(2, "0");
+          setDuration(`${m}:${s}`);
+        };
+      }
+      setStatus("done");
+    } catch {
+      setError("Impossible de contacter le serveur.");
+      setStatus("error");
+    }
+  }
+
+  function togglePlay() {
+    if (!audioRef.current) return;
+    if (playing) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
   }
 
   const selectedVoice = VOICES.find((v) => v.id === voice)!;
 
   return (
     <div className="studio-panel">
+      <audio
+        ref={audioRef}
+        onPlay={() => setPlaying(true)}
+        onPause={() => setPlaying(false)}
+        onEnded={() => setPlaying(false)}
+        hidden
+      />
+
       <div className="studio-form">
         <label className="studio-label">Texte à lire</label>
         <textarea
@@ -60,6 +121,8 @@ export default function VoiceStudio() {
         >
           {status === "loading" ? "Génération…" : <>✦ Générer la voix</>}
         </button>
+
+        {status === "error" && <p className="studio-error">⚠ {error}</p>}
       </div>
 
       <div className="studio-result studio-result-audio">
@@ -78,12 +141,7 @@ export default function VoiceStudio() {
         {status === "done" && (
           <div className="audio-player">
             <div className="audio-controls">
-              <button
-                type="button"
-                className="audio-play-btn"
-                onClick={() => setPlaying((p) => !p)}
-                aria-label={playing ? "Pause" : "Lecture"}
-              >
+              <button type="button" className="audio-play-btn" onClick={togglePlay} aria-label={playing ? "Pause" : "Lecture"}>
                 {playing ? (
                   <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor"><rect x="2" y="2" width="3.5" height="10" rx="1"/><rect x="8.5" y="2" width="3.5" height="10" rx="1"/></svg>
                 ) : (
@@ -95,11 +153,10 @@ export default function VoiceStudio() {
                   <span key={i} style={{ animationDelay: `${(i % 7) * 0.08}s`, height: `${18 + ((i * 37) % 60)}%` }} />
                 ))}
               </div>
-              <span className="audio-duration">0:24</span>
+              <span className="audio-duration">{duration}</span>
             </div>
             <div className="audio-footer">
               <span className="audio-voice-tag">{selectedVoice.emoji} Voix : {selectedVoice.name}</span>
-              <span className="studio-preview-badge audio-badge">Exemple — génération réelle bientôt disponible</span>
             </div>
           </div>
         )}
