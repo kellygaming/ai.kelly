@@ -422,13 +422,14 @@ export default function Home() {
                     <div className="gen-progress"><div className="gen-progress-bar"></div></div>
                     <span className="gen-tag">Génération…</span>
                   </div>
-                  <div className="gen-card gen-ready gr-1">
-                    <div className="gen-thumb thumb-a"></div>
-                    <span className="gen-tag gen-tag-ok">✓ Prêt</span>
-                  </div>
-                  <div className="gen-card gen-ready gr-2">
-                    <div className="gen-thumb thumb-b"></div>
-                    <span className="gen-tag gen-tag-ok">✓ Prêt</span>
+                  <div className="gen-card gen-showcase">
+                    <img src="/showcase/thumb-crate.jpg" alt="Miniature gaming créée avec KellyIA — caisse néon" className="carousel-img" />
+                    <img src="/showcase/thumb-sniper.jpg" alt="Miniature gaming créée avec KellyIA — sniper Call of Duty" className="carousel-img" />
+                    <span className="gen-tag gen-tag-ok">✓ Créées avec KellyIA</span>
+                    <div className="carousel-dots">
+                      <span className="carousel-dot dot-a"></span>
+                      <span className="carousel-dot dot-b"></span>
+                    </div>
                   </div>
                 </div>
               </div>
