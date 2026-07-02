@@ -506,6 +506,18 @@ export default function Home() {
             </div>
 
             <div className="script-ideas">
+              <div className="script-video-demo">
+                <video
+                  className="script-video"
+                  src="/showcase/script-demo.mp4"
+                  poster="/showcase/script-demo-poster.jpg"
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                />
+                <span className="script-video-badge">Exemple de rendu</span>
+              </div>
               <span className="script-ideas-label">Idées de sujets suggérées</span>
               <div className="idea-chip idea-1">🔥 Top 5 sensibilités Free Fire</div>
               <div className="idea-chip idea-2">🎯 3 astuces headshot COD Mobile</div>

@@ -561,6 +561,27 @@ img{ max-width:100%; display:block; }
 .idea-2{ animation-delay:.7s; }
 .idea-3{ animation-delay:1.4s; }
 
+.script-video-demo{
+  position:relative;
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:0 20px 50px -20px rgba(75,125,255,.35);
+  margin-bottom:4px;
+}
+.script-video{
+  display:block; width:100%; aspect-ratio:16/9;
+  object-fit:cover;
+  background:#0E0E18;
+}
+.script-video-badge{
+  position:absolute; left:10px; bottom:10px;
+  font-size:10.5px; font-weight:600; color:#fff;
+  background:rgba(0,0,0,.55);
+  backdrop-filter:blur(4px);
+  padding:5px 10px; border-radius:8px;
+}
+
 /* ==========================================================
    PRODUCTS
    ========================================================== */
