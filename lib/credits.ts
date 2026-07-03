@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-export type CreditType = "miniature" | "voice";
+export type CreditType = "chat" | "miniature" | "voice";
 
 export type CreditCheckResult = {
   ok: boolean;
@@ -42,6 +42,7 @@ export async function checkAndConsumeCredit(type: CreditType): Promise<CreditChe
     ok: boolean;
     error?: string;
     plan: string;
+    credits_chat: number;
     credits_miniatures: number;
     credits_voice: number;
   };
@@ -50,6 +51,11 @@ export async function checkAndConsumeCredit(type: CreditType): Promise<CreditChe
     return { ok: false, reason: "no_credits", plan: result.plan };
   }
 
-  const creditsRemaining = type === "miniature" ? result.credits_miniatures : result.credits_voice;
+  const creditsRemaining =
+    type === "chat"
+      ? result.credits_chat
+      : type === "miniature"
+        ? result.credits_miniatures
+        : result.credits_voice;
   return { ok: true, plan: result.plan, creditsRemaining };
 }

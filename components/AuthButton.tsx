@@ -6,6 +6,7 @@ import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 type SimpleUser = { id: string; name: string; avatar?: string; email?: string };
 type Profile = {
   plan: string;
+  credits_chat: number;
   credits_miniatures: number;
   credits_voice: number;
   credits_reset_at: string;
@@ -58,7 +59,7 @@ export default function AuthButton({ variant = "landing" }: { variant?: "landing
     const supabase = createClient();
     supabase
       .from("profiles")
-      .select("plan, credits_miniatures, credits_voice, credits_reset_at")
+      .select("plan, credits_chat, credits_miniatures, credits_voice, credits_reset_at")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -111,6 +112,10 @@ export default function AuthButton({ variant = "landing" }: { variant?: "landing
                 <span className="auth-menu-plan-badge">
                   Plan {profile.plan === "plus" ? "Plus" : "Gratuit"}
                 </span>
+                <div className="auth-menu-credit-row">
+                  <span>💬 Chat</span>
+                  <strong>{profile.credits_chat}</strong>
+                </div>
                 <div className="auth-menu-credit-row">
                   <span>🖼️ Miniatures</span>
                   <strong>{profile.credits_miniatures}</strong>

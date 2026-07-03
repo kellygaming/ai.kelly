@@ -1,11 +1,27 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
+import { startUpgrade } from "@/lib/upgrade";
 import "./landing.css";
 
 export default function Home() {
+  const [upgradeState, setUpgradeState] = useState<"idle" | "loading" | "error">("idle");
+  const [upgradeError, setUpgradeError] = useState("");
+
+  async function handleUpgradeClick() {
+    setUpgradeState("loading");
+    setUpgradeError("");
+    const { error } = await startUpgrade();
+    if (error) {
+      setUpgradeError(error);
+      setUpgradeState("error");
+    }
+    // Si pas d'erreur : soit redirection vers Google, soit vers MoneyFusion —
+    // dans les deux cas la page va changer, pas besoin de gérer "idle" ici.
+  }
+
   useEffect(() => {
     let cancelled = false;
     const cleanupFns: Array<() => void> = [];
@@ -252,7 +268,7 @@ export default function Home() {
       <header className="nav" id="nav">
         <div className="nav-inner">
           <Link href="/" className="logo">
-            <span className="logo-mark"></span>
+            <img src="/branding/logo-k.png" alt="KellyIA" className="logo-mark" />
             KellyIA
           </Link>
           <nav className="nav-links">
@@ -618,8 +634,9 @@ export default function Home() {
               <div className="price-amount">0 <small>FCFA</small></div>
               <p className="price-desc">Pour découvrir l'assistant au quotidien.</p>
               <ul className="price-list">
-                <li>Coaching gaming illimité</li>
-                <li>Réponses rapides</li>
+                <li>50 messages de coaching / mois</li>
+                <li>5 miniatures / mois</li>
+                <li>3 générations voix / mois</li>
                 <li>Historique 7 jours</li>
               </ul>
               <Link href="/chat" className="btn btn-ghost price-btn">Commencer</Link>
@@ -627,14 +644,24 @@ export default function Home() {
             <div className="price-card price-card-featured">
               <span className="price-tag price-tag-featured">Plus</span>
               <div className="price-amount">2 500 <small>FCFA / mois</small></div>
-              <p className="price-desc">Pour ceux qui veulent tout, sans limite.</p>
+              <p className="price-desc">Pour les créateurs et joueurs réguliers.</p>
               <ul className="price-list">
-                <li>Coaching prioritaire illimité</li>
-                <li>Miniatures TikTok / YouTube illimitées</li>
-                <li>Scripts vidéo illimités</li>
+                <li>500 messages de coaching / mois</li>
+                <li>20 miniatures TikTok / YouTube / mois</li>
+                <li>15 générations voix / mois</li>
                 <li>Historique illimité</li>
               </ul>
-              <Link href="/chat" className="btn btn-primary price-btn">S'abonner</Link>
+              <button
+                type="button"
+                className="btn btn-primary price-btn"
+                onClick={handleUpgradeClick}
+                disabled={upgradeState === "loading"}
+              >
+                {upgradeState === "loading" ? "Un instant…" : "S'abonner"}
+              </button>
+              {upgradeState === "error" && (
+                <p className="price-error">⚠ {upgradeError}</p>
+              )}
             </div>
           </div>
 
@@ -760,7 +787,7 @@ export default function Home() {
               <span>La version gratuite suffit-elle ?</span>
               <span className="faq-plus">+</span>
             </button>
-            <div className="faq-a"><p>Oui pour un usage quotidien de coaching. L'offre Plus débloque les miniatures et scripts vidéo en illimité.</p></div>
+            <div className="faq-a"><p>Oui pour un usage quotidien de coaching (50 messages/mois inclus). L'offre Plus monte à 500 messages, 20 miniatures et 15 générations voix par mois.</p></div>
           </div>
           <div className="faq-item">
             <button className="faq-q">
@@ -793,7 +820,7 @@ export default function Home() {
       <footer className="footer">
         <div className="footer-top">
           <div className="footer-brand">
-            <Link href="/" className="logo"><span className="logo-mark"></span>KellyIA</Link>
+            <Link href="/" className="logo"><img src="/branding/logo-k.png" alt="KellyIA" className="logo-mark" />KellyIA</Link>
             <p>L'IA gaming et créateur, pensée pour l'Afrique francophone.</p>
           </div>
           <div className="footer-col">

@@ -3,12 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import AuthButton from "@/components/AuthButton";
+import { startUpgrade } from "@/lib/upgrade";
+import { signInWithGoogle } from "@/lib/auth";
 import "./chat.css";
 import ImageStudio from "./ImageStudio";
 import VoiceStudio from "./VoiceStudio";
 
 type Msg = { role: "user" | "assistant"; content: string };
 type Mode = "chat" | "image" | "voice";
+type Blocked = { message: string; code: "not_authenticated" | "no_credits" } | null;
 
 const SUGGESTIONS = [
   "Comment améliorer ma précision sur Free Fire ?",
@@ -27,14 +30,27 @@ export default function ChatPage() {
   const [mode, setMode] = useState<Mode>("chat");
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [thinking, setThinking] = useState(false);
+  const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState("");
+  const [blocked, setBlocked] = useState<Blocked>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const busy = thinking || streaming;
+
+  // Reprend automatiquement le paiement si on revient d'une connexion
+  // déclenchée par le bouton "S'abonner" (voir lib/upgrade.ts).
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("upgrade") === "1") {
+      window.history.replaceState({}, "", "/chat");
+      startUpgrade();
+    }
+  }, []);
 
   useEffect(() => {
     bodyRef.current?.scrollTo({ top: bodyRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, loading, mode]);
+  }, [messages, thinking, mode]);
 
   useEffect(() => {
     const el = textareaRef.current;
@@ -45,13 +61,14 @@ export default function ChatPage() {
 
   async function send(text: string) {
     const question = text.trim();
-    if (!question || loading) return;
+    if (!question || busy) return;
 
     const nextMessages: Msg[] = [...messages, { role: "user", content: question }];
     setMessages(nextMessages);
     setInput("");
     setError("");
-    setLoading(true);
+    setBlocked(null);
+    setThinking(true);
 
     try {
       const res = await fetch("/api/chat", {
@@ -59,17 +76,52 @@ export default function ChatPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: nextMessages }),
       });
-      const data = await res.json();
 
       if (!res.ok) {
-        setError(data?.error || "Une erreur est survenue.");
-      } else {
-        setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
+        const data = await res.json().catch(() => ({}));
+        setThinking(false);
+        if (data?.code === "not_authenticated" || data?.code === "no_credits") {
+          setBlocked({ message: data.error, code: data.code });
+        } else {
+          setError(data?.error || "Une erreur est survenue.");
+        }
+        return;
+      }
+
+      if (!res.body) throw new Error("no body");
+
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulated = "";
+      let started = false;
+      setStreaming(true);
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        const chunk = decoder.decode(value, { stream: true });
+        if (!chunk) continue;
+        if (!started) {
+          started = true;
+          setThinking(false);
+          setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+        }
+        accumulated += chunk;
+        setMessages((prev) => {
+          const copy = [...prev];
+          copy[copy.length - 1] = { role: "assistant", content: accumulated };
+          return copy;
+        });
+      }
+
+      if (!started) {
+        setError("Réponse vide — réessaie.");
       }
     } catch {
       setError("Impossible de contacter le serveur.");
     } finally {
-      setLoading(false);
+      setThinking(false);
+      setStreaming(false);
     }
   }
 
@@ -93,7 +145,7 @@ export default function ChatPage() {
           <span aria-hidden="true">←</span> Accueil
         </Link>
         <div className="chat-brand">
-          <span className="chat-logo-mark" />
+          <img src="/branding/logo-k.png" alt="KellyIA" className="chat-logo-mark" />
           <span className="chat-brand-name">KellyIA</span>
         </div>
         <div className="chat-header-right">
@@ -125,7 +177,7 @@ export default function ChatPage() {
           {/* Messages */}
           <div ref={bodyRef} className="chat-body">
             <div className="chat-scroll-inner">
-              {messages.length === 0 && (
+              {messages.length === 0 && !blocked && (
                 <div className="chat-empty">
                   <div className="chat-empty-icon">✦</div>
                   <h2>Prêt à progresser ?</h2>
@@ -147,18 +199,40 @@ export default function ChatPage() {
                   </div>
                   <div className={`msg-bubble ${m.role === "user" ? "user" : "ai"}`}>
                     {m.content}
+                    {streaming && i === messages.length - 1 && m.role === "assistant" && (
+                      <span className="stream-cursor">▍</span>
+                    )}
                   </div>
                 </div>
               ))}
 
-              {loading && (
+              {thinking && (
                 <div className="msg-row assistant">
                   <div className="msg-avatar ai">✦</div>
                   <div className="msg-bubble ai">
-                    <div className="typing-dots">
-                      <span /><span /><span />
+                    <div className="thinking-indicator">
+                      <span className="thinking-dot" />
+                      <span className="thinking-dot" />
+                      <span className="thinking-dot" />
+                      <span className="thinking-label">Réflexion en cours…</span>
                     </div>
                   </div>
+                </div>
+              )}
+
+              {blocked && (
+                <div className="chat-blocked">
+                  <span className="chat-blocked-icon">🔒</span>
+                  <p>{blocked.message}</p>
+                  {blocked.code === "no_credits" ? (
+                    <button type="button" className="studio-blocked-action" onClick={() => startUpgrade()}>
+                      ✦ Passer à l'offre Plus
+                    </button>
+                  ) : (
+                    <button type="button" className="studio-blocked-action" onClick={() => signInWithGoogle("/chat")}>
+                      Se connecter
+                    </button>
+                  )}
                 </div>
               )}
 
@@ -184,11 +258,11 @@ export default function ChatPage() {
                   placeholder="Écrivez votre message..."
                   rows={1}
                   className="chat-textarea"
-                  disabled={loading}
+                  disabled={busy}
                 />
                 <button
                   type="submit"
-                  disabled={loading || !input.trim()}
+                  disabled={busy || !input.trim()}
                   className="chat-send"
                   aria-label="Envoyer"
                 >

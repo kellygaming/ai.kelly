@@ -1,6 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { startUpgrade } from "@/lib/upgrade";
+import { signInWithGoogle } from "@/lib/auth";
 
 const EXAMPLES = ["/showcase/thumb-crate.jpg", "/showcase/thumb-sniper.jpg"];
 const MAX_DIMENSION = 1280;
@@ -46,6 +48,7 @@ export default function ImageStudio() {
   const [isExample, setIsExample] = useState(false);
   const [error, setError] = useState("");
   const [blockedReason, setBlockedReason] = useState<string | null>(null);
+  const [blockedCode, setBlockedCode] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -109,6 +112,7 @@ export default function ImageStudio() {
       if (!res.ok) {
         if (data?.code === "not_authenticated" || data?.code === "no_credits") {
           setBlockedReason(data.error);
+          setBlockedCode(data.code);
           setStatus("idle");
           return;
         }
@@ -225,6 +229,15 @@ export default function ImageStudio() {
           <div className="studio-blocked">
             <span className="studio-blocked-icon">🔒</span>
             <p>{blockedReason}</p>
+            {blockedCode === "no_credits" ? (
+              <button type="button" className="studio-blocked-action" onClick={() => startUpgrade()}>
+                ✦ Passer à l'offre Plus
+              </button>
+            ) : (
+              <button type="button" className="studio-blocked-action" onClick={() => signInWithGoogle("/chat")}>
+                Se connecter
+              </button>
+            )}
           </div>
         )}
         {!blockedReason && status === "idle" && (
