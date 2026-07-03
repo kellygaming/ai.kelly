@@ -26,7 +26,18 @@ export async function startUpgrade(): Promise<{ error?: string }> {
   }
 
   try {
-    const res = await fetch("/api/checkout", { method: "POST" });
+    const phone = window.prompt(
+      "Ton numéro de téléphone Mobile Money (Wave, Orange, MTN...) pour le paiement :"
+    );
+    if (!phone || !phone.trim()) {
+      return { error: "Numéro de téléphone requis pour continuer." };
+    }
+
+    const res = await fetch("/api/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone: phone.trim() }),
+    });
     const data = await res.json();
     if (!res.ok || !data?.url) {
       return { error: data?.error || "Impossible de démarrer le paiement." };

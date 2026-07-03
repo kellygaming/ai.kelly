@@ -23,6 +23,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Connecte-toi d'abord." }, { status: 401 });
     }
 
+    const { phone } = await req.json().catch(() => ({ phone: undefined }));
+    if (!phone || typeof phone !== "string" || !phone.trim()) {
+      return NextResponse.json(
+        { error: "Numéro de téléphone requis pour le paiement." },
+        { status: 400 }
+      );
+    }
+
     const apiUrl = process.env.MONEYFUSION_API_URL;
     const webhookSecret = process.env.MONEYFUSION_WEBHOOK_SECRET;
     if (!apiUrl || !webhookSecret) {
@@ -35,22 +43,21 @@ export async function POST(req: Request) {
     const origin = new URL(req.url).origin;
     const orderId = crypto.randomUUID();
 
+    // Format officiel FusionPay : chaque entrée d'"article" est un objet où
+    // la clé est le nom de l'article et la valeur son prix (pas {nom, montant}).
     const payload = {
       totalPrice: PLUS_PRICE_XOF,
-      article: [{ nom: "Abonnement KellyIA Plus — 1 mois", montant: PLUS_PRICE_XOF }],
-      personal_Info: [{ userId: user.id, orderId }],
+      article: [{ "Abonnement KellyIA Plus — 1 mois": PLUS_PRICE_XOF }],
+      numeroSend: phone.trim(),
       nomclient: user.user_metadata?.full_name || user.email || "Client KellyIA",
+      personal_Info: [{ userId: user.id, orderId }],
       return_url: `${origin}/chat?upgrade=en_cours`,
       webhook_url: `${origin}/api/webhooks/moneyfusion?secret=${webhookSecret}`,
     };
 
-    // On normalise l'URL : que MONEYFUSION_API_URL se termine déjà par
-    // "/pay/" (comme fourni par le dashboard) ou non, on n'ajoute jamais
-    // "/pay/" en double.
-    const normalizedApiUrl = apiUrl.replace(/\/+$/, ""); // enlève les / finaux
-    const endpoint = normalizedApiUrl.endsWith("/pay")
-      ? `${normalizedApiUrl}/`
-      : `${normalizedApiUrl}/pay/`;
+    // L'URL du dashboard MoneyFusion est le lien API complet, prêt à
+    // l'emploi — on ne doit rien y ajouter (doc officielle FusionPay).
+    const endpoint = apiUrl.trim();
 
     const response = await fetch(endpoint, {
       method: "POST",
@@ -68,9 +75,17 @@ export async function POST(req: Request) {
     }
 
     const data = await response.json();
+    console.log("Réponse MoneyFusion (checkout):", JSON.stringify(data));
+
     if (!data?.url) {
-      console.error("Réponse MoneyFusion inattendue:", data);
-      return NextResponse.json({ error: "Réponse de paiement invalide." }, { status: 502 });
+      return NextResponse.json(
+        {
+          error: data?.message
+            ? `MoneyFusion : ${data.message}`
+            : "Réponse de paiement invalide (voir logs serveur).",
+        },
+        { status: 502 }
+      );
     }
 
     return NextResponse.json({ url: data.url });

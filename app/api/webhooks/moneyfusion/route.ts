@@ -15,7 +15,9 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
-    const statut = body?.statut;
+    console.log("Webhook MoneyFusion reçu:", JSON.stringify(body));
+
+    const event = body?.event; // "payin.session.pending" | "payin.session.completed" | "payin.session.cancelled"
     const personalInfo = body?.personal_Info?.[0];
     const userId = personalInfo?.userId;
 
@@ -24,11 +26,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "userId manquant." }, { status: 400 });
     }
 
-    // On répond 200 même pour les paiements non aboutis (annulé, échoué) —
-    // MoneyFusion n'a pas besoin de réessayer dans ce cas, on ne fait juste
-    // rien côté compte.
-    if (statut !== "paid") {
-      return NextResponse.json({ ok: true, ignored: true });
+    // On ne réagit qu'à l'événement de succès. "pending" (répété plusieurs
+    // fois pendant le traitement) et "cancelled" ne changent rien au compte.
+    if (event !== "payin.session.completed") {
+      return NextResponse.json({ ok: true, ignored: true, event });
     }
 
     const admin = createAdminClient();
