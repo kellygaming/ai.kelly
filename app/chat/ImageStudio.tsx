@@ -40,10 +40,12 @@ export default function ImageStudio() {
   const [format, setFormat] = useState<"tiktok" | "youtube">("tiktok");
   const [refImage, setRefImage] = useState<string | null>(null);
   const [suggesting, setSuggesting] = useState(false);
+  const [enhanced, setEnhanced] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done">("idle");
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [isExample, setIsExample] = useState(false);
   const [error, setError] = useState("");
+  const [blockedReason, setBlockedReason] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(e: React.ChangeEvent<HTMLInputElement>) {
@@ -52,14 +54,22 @@ export default function ImageStudio() {
     try {
       const dataUrl = await resizeImage(file);
       setRefImage(dataUrl);
+      setEnhanced(false);
     } catch {
       setError("Impossible de lire cette image.");
     }
     e.target.value = "";
   }
 
-  async function suggestPrompt() {
-    if (!refImage || suggesting) return;
+  function handlePromptChange(value: string) {
+    setPrompt(value);
+    // Toute modification manuelle invalide l'amélioration précédente :
+    // on ne veut pas qu'on puisse contourner l'étape en réécrivant après coup.
+    setEnhanced(false);
+  }
+
+  async function enhancePrompt() {
+    if (suggesting || (!prompt.trim() && !refImage)) return;
     setSuggesting(true);
     setError("");
     try {
@@ -70,9 +80,10 @@ export default function ImageStudio() {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data?.error || "Impossible de suggérer un prompt.");
+        setError(data?.error || "Impossible d'améliorer ce prompt.");
       } else {
         setPrompt(data.prompt);
+        setEnhanced(true);
       }
     } catch {
       setError("Impossible de contacter le serveur.");
@@ -82,9 +93,10 @@ export default function ImageStudio() {
   }
 
   async function generate() {
-    if (!prompt.trim() || status === "loading") return;
+    if (!enhanced || !prompt.trim() || status === "loading") return;
     setStatus("loading");
     setError("");
+    setBlockedReason(null);
 
     try {
       const res = await fetch("/api/generate-image", {
@@ -95,6 +107,11 @@ export default function ImageStudio() {
       const data = await res.json();
 
       if (!res.ok) {
+        if (data?.code === "not_authenticated" || data?.code === "no_credits") {
+          setBlockedReason(data.error);
+          setStatus("idle");
+          return;
+        }
         setError(data?.error || "Une erreur est survenue.");
         setResultUrl(EXAMPLES[Math.floor(Math.random() * EXAMPLES.length)]);
         setIsExample(true);
@@ -113,19 +130,28 @@ export default function ImageStudio() {
     }
   }
 
+  const canEnhance = (prompt.trim().length > 0 || !!refImage) && !suggesting;
+
   return (
     <div className="studio-panel">
       <div className="studio-form">
         <div className="studio-tips">
           💡 Astuce : dépose une image qui ressemble à ce que tu veux (capture d'écran, miniature
-          existante), puis décris juste ce qui doit changer. Le résultat sera bien plus proche de
-          ton idée qu'avec un texte seul.
+          existante), écris ton idée, puis clique sur <strong>Améliorer le prompt</strong> — le
+          résultat sera nettement meilleur qu'avec un prompt brut.
         </div>
 
         {refImage ? (
           <div className="ref-image-preview">
             <img src={refImage} alt="Image de référence" />
-            <button type="button" className="ref-image-remove" onClick={() => setRefImage(null)}>
+            <button
+              type="button"
+              className="ref-image-remove"
+              onClick={() => {
+                setRefImage(null);
+                setEnhanced(false);
+              }}
+            >
               ✕ Retirer
             </button>
           </div>
@@ -142,21 +168,30 @@ export default function ImageStudio() {
           style={{ display: "none" }}
         />
 
-        <div className="studio-label-row">
-          <label className="studio-label">Décris ta miniature</label>
-          {refImage && (
-            <button type="button" className="suggest-btn" onClick={suggestPrompt} disabled={suggesting}>
-              {suggesting ? "Analyse…" : "✦ Suggérer un prompt"}
-            </button>
-          )}
-        </div>
+        <label className="studio-label">Ton idée</label>
         <textarea
           value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Ex : texte « TOP 5 ASTUCES » en gros, style néon violet, fond flou..."
+          onChange={(e) => handlePromptChange(e.target.value)}
+          placeholder="Ex : texte « TOP 5 ASTUCES », style néon violet, fond flou..."
           className="studio-textarea"
-          rows={4}
+          rows={3}
         />
+
+        <button
+          type="button"
+          className={`enhance-btn ${enhanced ? "enhance-btn-done" : ""}`}
+          onClick={enhancePrompt}
+          disabled={!canEnhance}
+        >
+          <span className="enhance-btn-shine" />
+          {suggesting ? (
+            "Amélioration en cours…"
+          ) : enhanced ? (
+            <>✓ Prompt amélioré — prêt à générer</>
+          ) : (
+            <>✨ Améliorer le prompt (obligatoire)</>
+          )}
+        </button>
 
         <div className="studio-row">
           <div className="format-toggle-studio">
@@ -168,16 +203,31 @@ export default function ImageStudio() {
             </button>
           </div>
 
-          <button type="button" className="studio-generate" onClick={generate} disabled={!prompt.trim() || status === "loading"}>
-            {status === "loading" ? "Génération…" : <>✦ Générer</>}
+          <button
+            type="button"
+            className="studio-generate"
+            onClick={generate}
+            disabled={!enhanced || !prompt.trim() || status === "loading"}
+            title={!enhanced ? "Améliore d'abord ton prompt" : undefined}
+          >
+            {status === "loading" ? "Génération…" : enhanced ? <>✦ Générer</> : <>🔒 Générer</>}
           </button>
         </div>
+        {!enhanced && (
+          <p className="studio-lock-hint">👆 Améliore ton prompt pour débloquer la génération</p>
+        )}
 
         {error && <p className="studio-error">⚠ {error}</p>}
       </div>
 
       <div className={`studio-result ${format === "tiktok" ? "fmt-tiktok" : "fmt-youtube"}`}>
-        {status === "idle" && (
+        {blockedReason && (
+          <div className="studio-blocked">
+            <span className="studio-blocked-icon">🔒</span>
+            <p>{blockedReason}</p>
+          </div>
+        )}
+        {!blockedReason && status === "idle" && (
           <div className="studio-placeholder">
             <span className="studio-placeholder-icon">🖼️</span>
             <p>Ton résultat apparaîtra ici</p>

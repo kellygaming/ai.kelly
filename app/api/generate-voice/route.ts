@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkAndConsumeCredit } from "@/lib/credits";
 
 export const runtime = "nodejs";
 
@@ -17,6 +18,29 @@ export async function POST(req: Request) {
 
     if (!text || typeof text !== "string" || !text.trim()) {
       return NextResponse.json({ error: "Aucun texte reçu." }, { status: 400 });
+    }
+
+    const credit = await checkAndConsumeCredit("voice");
+    if (!credit.ok) {
+      if (credit.reason === "not_authenticated") {
+        return NextResponse.json(
+          { error: "Connecte-toi pour générer une voix.", code: "not_authenticated" },
+          { status: 401 }
+        );
+      }
+      if (credit.reason === "no_credits") {
+        return NextResponse.json(
+          {
+            error:
+              credit.plan === "plus"
+                ? "Crédits voix épuisés pour ce mois-ci."
+                : "Crédits voix gratuits épuisés — passe à l'offre Plus pour continuer.",
+            code: "no_credits",
+          },
+          { status: 402 }
+        );
+      }
+      return NextResponse.json({ error: "Erreur de vérification des crédits." }, { status: 500 });
     }
 
     const apiKey = process.env.ELEVENLABS_API_KEY;

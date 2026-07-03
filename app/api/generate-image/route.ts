@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { checkAndConsumeCredit } from "@/lib/credits";
 
 export const runtime = "nodejs";
 
@@ -14,6 +15,29 @@ export async function POST(req: Request) {
 
     if (!prompt || typeof prompt !== "string" || !prompt.trim()) {
       return NextResponse.json({ error: "Aucune description reçue." }, { status: 400 });
+    }
+
+    const credit = await checkAndConsumeCredit("miniature");
+    if (!credit.ok) {
+      if (credit.reason === "not_authenticated") {
+        return NextResponse.json(
+          { error: "Connecte-toi pour générer des miniatures.", code: "not_authenticated" },
+          { status: 401 }
+        );
+      }
+      if (credit.reason === "no_credits") {
+        return NextResponse.json(
+          {
+            error:
+              credit.plan === "plus"
+                ? "Crédits miniatures épuisés pour ce mois-ci."
+                : "Crédits miniatures gratuits épuisés — passe à l'offre Plus pour continuer.",
+            code: "no_credits",
+          },
+          { status: 402 }
+        );
+      }
+      return NextResponse.json({ error: "Erreur de vérification des crédits." }, { status: 500 });
     }
 
     const apiKey = process.env.FAL_KEY;

@@ -118,6 +118,14 @@
   z-index:50;
 }
 .auth-user-chat .auth-menu-email{ font-size:11.5px; color:var(--c-text-3); padding:0 4px; word-break:break-all; }
+.auth-user-chat .auth-menu-plan{
+  padding:10px; border-radius:10px;
+  background:rgba(164,75,255,.06); border:1px solid rgba(164,75,255,.18);
+  display:flex; flex-direction:column; gap:6px;
+}
+.auth-user-chat .auth-menu-plan-badge{ font-size:11px; font-weight:700; color:var(--c-violet-light); }
+.auth-user-chat .auth-menu-credit-row{ display:flex; align-items:center; justify-content:space-between; font-size:11.5px; color:var(--c-text-2); }
+.auth-user-chat .auth-menu-credit-row strong{ color:#fff; }
 .auth-user-chat .auth-menu-signout{
   font-size:12.5px; text-align:left; padding:8px 10px; border-radius:8px;
   background:rgba(255,255,255,.04); color:var(--c-text-2);
@@ -372,6 +380,51 @@
   transition:opacity .2s;
 }
 .suggest-btn:disabled{ opacity:.5; }
+
+/* Bouton "Améliorer le prompt" — obligatoire, doit se voir immédiatement */
+.enhance-btn{
+  position:relative; overflow:hidden;
+  width:100%; padding:13px 18px; border-radius:14px;
+  font-size:14px; font-weight:700; color:#fff;
+  background:linear-gradient(120deg, var(--c-violet), var(--c-pink), var(--c-violet));
+  background-size:200% auto;
+  animation:enhance-glow 2.4s linear infinite, enhance-pulse 2.4s ease-in-out infinite;
+  box-shadow:0 8px 28px -8px rgba(164,75,255,.6);
+  transition:opacity .2s, transform .2s;
+}
+.enhance-btn:hover:not(:disabled){ transform:translateY(-1px); }
+.enhance-btn:disabled{ opacity:.4; animation:none; cursor:not-allowed; }
+.enhance-btn-done{
+  background:linear-gradient(120deg, #1c8a52, #2FBE72);
+  animation:none;
+  box-shadow:0 8px 24px -10px rgba(47,190,114,.5);
+}
+@keyframes enhance-glow{ to{ background-position:200% center; } }
+@keyframes enhance-pulse{
+  0%,100%{ box-shadow:0 8px 28px -8px rgba(164,75,255,.6); }
+  50%{ box-shadow:0 8px 34px -6px rgba(255,79,216,.75); }
+}
+.enhance-btn-shine{
+  position:absolute; top:0; left:-60%; width:40%; height:100%;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.35), transparent);
+  transform:skewX(-20deg);
+  animation:enhance-shine 2.6s ease-in-out infinite;
+}
+@keyframes enhance-shine{
+  0%{ left:-60%; }
+  50%{ left:130%; }
+  100%{ left:130%; }
+}
+.enhance-btn-done .enhance-btn-shine{ display:none; }
+
+.studio-lock-hint{
+  font-size:11.5px; color:var(--c-text-3); text-align:center; margin-top:-4px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .enhance-btn{ animation:none; }
+  .enhance-btn-shine{ animation:none; display:none; }
+}
 .format-toggle-studio{
   display:flex; gap:4px; padding:4px; border-radius:999px;
   background:rgba(255,255,255,.03); border:1px solid var(--c-border);
@@ -413,6 +466,10 @@
 .studio-placeholder{ text-align:center; color:var(--c-text-3); }
 .studio-placeholder-icon{ font-size:26px; display:block; margin-bottom:8px; opacity:.6; }
 .studio-placeholder p{ font-size:13px; }
+
+.studio-blocked{ text-align:center; color:var(--c-text-2); padding:0 20px; }
+.studio-blocked-icon{ font-size:24px; display:block; margin-bottom:10px; }
+.studio-blocked p{ font-size:13px; line-height:1.5; }
 
 .studio-loading{ position:relative; width:100%; height:100%; min-height:200px; }
 

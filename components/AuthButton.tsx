@@ -3,13 +3,21 @@
 import { useEffect, useState } from "react";
 import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 
-type SimpleUser = { name: string; avatar?: string; email?: string };
+type SimpleUser = { id: string; name: string; avatar?: string; email?: string };
+type Profile = {
+  plan: string;
+  credits_miniatures: number;
+  credits_voice: number;
+  credits_reset_at: string;
+};
 
 function mapUser(u: {
+  id: string;
   email?: string;
   user_metadata?: { full_name?: string; name?: string; avatar_url?: string };
 }): SimpleUser {
   return {
+    id: u.id,
     name: u.user_metadata?.full_name || u.user_metadata?.name || u.email || "Compte",
     avatar: u.user_metadata?.avatar_url,
     email: u.email,
@@ -18,6 +26,7 @@ function mapUser(u: {
 
 export default function AuthButton({ variant = "landing" }: { variant?: "landing" | "chat" }) {
   const [user, setUser] = useState<SimpleUser | null>(null);
+  const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -40,6 +49,22 @@ export default function AuthButton({ variant = "landing" }: { variant?: "landing
 
     return () => sub.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!user || !isSupabaseConfigured()) {
+      setProfile(null);
+      return;
+    }
+    const supabase = createClient();
+    supabase
+      .from("profiles")
+      .select("plan, credits_miniatures, credits_voice, credits_reset_at")
+      .eq("id", user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setProfile(data as Profile);
+      });
+  }, [user]);
 
   async function signIn() {
     if (!isSupabaseConfigured()) return;
@@ -81,6 +106,21 @@ export default function AuthButton({ variant = "landing" }: { variant?: "landing
         {menuOpen && (
           <div className="auth-menu">
             <span className="auth-menu-email">{user.email}</span>
+            {profile && (
+              <div className="auth-menu-plan">
+                <span className="auth-menu-plan-badge">
+                  Plan {profile.plan === "plus" ? "Plus" : "Gratuit"}
+                </span>
+                <div className="auth-menu-credit-row">
+                  <span>🖼️ Miniatures</span>
+                  <strong>{profile.credits_miniatures}</strong>
+                </div>
+                <div className="auth-menu-credit-row">
+                  <span>🎙️ Voix</span>
+                  <strong>{profile.credits_voice}</strong>
+                </div>
+              </div>
+            )}
             <button className="auth-menu-signout" onClick={signOut}>
               Se déconnecter
             </button>

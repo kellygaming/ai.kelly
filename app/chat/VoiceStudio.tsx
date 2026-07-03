@@ -14,6 +14,7 @@ export default function VoiceStudio() {
   const [voice, setVoice] = useState(VOICES[0].id);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
+  const [blockedReason, setBlockedReason] = useState<string | null>(null);
   const [playing, setPlaying] = useState(false);
   const [duration, setDuration] = useState("0:00");
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -29,6 +30,7 @@ export default function VoiceStudio() {
     if (!text.trim() || status === "loading") return;
     setStatus("loading");
     setError("");
+    setBlockedReason(null);
     setPlaying(false);
 
     try {
@@ -40,6 +42,11 @@ export default function VoiceStudio() {
 
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
+        if (data?.code === "not_authenticated" || data?.code === "no_credits") {
+          setBlockedReason(data.error);
+          setStatus("idle");
+          return;
+        }
         setError(data?.error || "Une erreur est survenue.");
         setStatus("error");
         return;
@@ -126,7 +133,13 @@ export default function VoiceStudio() {
       </div>
 
       <div className="studio-result studio-result-audio">
-        {status === "idle" && (
+        {blockedReason && (
+          <div className="studio-blocked">
+            <span className="studio-blocked-icon">🔒</span>
+            <p>{blockedReason}</p>
+          </div>
+        )}
+        {!blockedReason && status === "idle" && (
           <div className="studio-placeholder">
             <span className="studio-placeholder-icon">🎧</span>
             <p>Ton audio apparaîtra ici</p>
