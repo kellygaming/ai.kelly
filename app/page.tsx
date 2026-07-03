@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
+import AuthButton from "@/components/AuthButton";
 import "./landing.css";
 
 export default function Home() {
@@ -262,7 +263,7 @@ export default function Home() {
             <a href="#faq">FAQ</a>
           </nav>
           <div className="nav-actions">
-            <a href="#" className="btn btn-ghost">Se connecter</a>
+            <AuthButton variant="landing" />
             <Link href="/chat" className="btn btn-primary">Commencer</Link>
           </div>
           <button className="nav-burger" id="navBurger" aria-label="Ouvrir le menu">

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import AuthButton from "@/components/AuthButton";
 import "./chat.css";
 import ImageStudio from "./ImageStudio";
 import VoiceStudio from "./VoiceStudio";
@@ -95,9 +96,12 @@ export default function ChatPage() {
           <span className="chat-logo-mark" />
           <span className="chat-brand-name">KellyIA</span>
         </div>
-        <div className="chat-status">
-          <span className="chat-status-dot" />
-          En ligne
+        <div className="chat-header-right">
+          <div className="chat-status">
+            <span className="chat-status-dot" />
+            En ligne
+          </div>
+          <AuthButton variant="chat" />
         </div>
       </header>
 
