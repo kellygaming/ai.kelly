@@ -42,9 +42,9 @@ export async function POST(req: Request) {
       .from("profiles")
       .update({
         plan: "plus",
-        credits_chat: 500,
-        credits_miniatures: 20,
-        credits_voice: 15,
+        credits_chat: 300,
+        credits_miniatures: 12,
+        credits_voice: 8,
         credits_reset_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         subscription_expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
         updated_at: new Date().toISOString(),

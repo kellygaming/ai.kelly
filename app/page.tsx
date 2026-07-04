@@ -634,21 +634,21 @@ export default function Home() {
               <div className="price-amount">0 <small>FCFA</small></div>
               <p className="price-desc">Pour découvrir l'assistant au quotidien.</p>
               <ul className="price-list">
-                <li>50 messages de coaching / mois</li>
-                <li>5 miniatures / mois</li>
-                <li>3 générations voix / mois</li>
+                <li>20 messages de coaching / mois</li>
+                <li>3 miniatures / mois</li>
+                <li>2 générations voix / mois</li>
                 <li>Historique 7 jours</li>
               </ul>
               <Link href="/chat" className="btn btn-ghost price-btn">Commencer</Link>
             </div>
             <div className="price-card price-card-featured">
               <span className="price-tag price-tag-featured">Plus</span>
-              <div className="price-amount">2 500 <small>FCFA / mois</small></div>
+              <div className="price-amount">3 500 <small>FCFA / mois</small></div>
               <p className="price-desc">Pour les créateurs et joueurs réguliers.</p>
               <ul className="price-list">
-                <li>500 messages de coaching / mois</li>
-                <li>20 miniatures TikTok / YouTube / mois</li>
-                <li>15 générations voix / mois</li>
+                <li>300 messages de coaching / mois</li>
+                <li>12 miniatures TikTok / YouTube / mois</li>
+                <li>8 générations voix / mois</li>
                 <li>Historique illimité</li>
               </ul>
               <button
@@ -787,7 +787,7 @@ export default function Home() {
               <span>La version gratuite suffit-elle ?</span>
               <span className="faq-plus">+</span>
             </button>
-            <div className="faq-a"><p>Oui pour un usage quotidien de coaching (50 messages/mois inclus). L'offre Plus monte à 500 messages, 20 miniatures et 15 générations voix par mois.</p></div>
+            <div className="faq-a"><p>Oui pour un usage quotidien de coaching (20 messages/mois inclus). L'offre Plus monte à 300 messages, 12 miniatures et 8 générations voix par mois.</p></div>
           </div>
           <div className="faq-item">
             <button className="faq-q">

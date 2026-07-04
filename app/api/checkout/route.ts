@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-const PLUS_PRICE_XOF = 2500;
+const PLUS_PRICE_XOF = 3500;
 
 export async function POST(req: Request) {
   try {
