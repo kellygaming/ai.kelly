@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recharge PUBG Mobile - Kelly Gaming</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Orbitron', 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a2e 50%, #0f0f0f 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container { width: 100%; max-width: 500px; }
+
+        .header { text-align: center; margin-bottom: 40px; }
+        .header h1 {
+            font-size: 2.5em; color: #ff2244;
+            text-shadow: 0 0 20px rgba(255,34,68,0.5);
+            margin-bottom: 10px; font-weight: bold; letter-spacing: 2px;
+        }
+        .header p { color: #888899; font-size: 0.9em; font-family: 'Rajdhani', Arial, sans-serif; }
+
+        .recharge-card {
+            background: linear-gradient(135deg, #0e0e1a 0%, #13131f 100%);
+            border: 2px solid #ff2244; border-radius: 15px; padding: 40px;
+            box-shadow: 0 0 30px rgba(255,34,68,0.3), inset 0 0 30px rgba(255,34,68,0.1);
+            animation: slideIn 0.6s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group { margin-bottom: 25px; }
+        .form-group label {
+            display: block; margin-bottom: 10px; font-size: 1.1em;
+            color: #ff2244; font-weight: bold; font-family: 'Orbitron', Arial, sans-serif;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%; padding: 15px; border: 2px solid #333;
+            border-radius: 8px; background-color: #0f1419; color: #fff;
+            font-size: 1em; font-family: 'Rajdhani', Arial, sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: #ff2244;
+            box-shadow: 0 0 15px rgba(255,34,68,0.5); background-color: #1a1f2e;
+        }
+
+        .form-group input::placeholder { color: #666; }
+
+        .info-box {
+            background: rgba(255,34,68,0.1); border-left: 4px solid #ff2244;
+            padding: 12px; border-radius: 6px; margin-bottom: 20px;
+            font-size: 0.9em; color: #ccc; font-family: 'Rajdhani', Arial, sans-serif;
+        }
+        .info-box strong { color: #ff2244; }
+
+        .id-row { display: flex; gap: 10px; align-items: center; }
+        .id-row input { flex: 1; }
+
+        .btn-verifier {
+            padding: 15px 20px; background: transparent; border: 2px solid #ff2244;
+            color: #ff2244; border-radius: 8px; font-family: 'Orbitron', Arial, sans-serif;
+            font-size: 0.75em; font-weight: bold; text-transform: uppercase;
+            letter-spacing: 1px; cursor: pointer; transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        .btn-verifier:hover { background: rgba(255,34,68,0.15); box-shadow: 0 0 15px rgba(255,34,68,0.3); }
+        .btn-verifier:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #resultatValidation {
+            margin-top: 10px; font-weight: bold; font-size: 0.9em;
+            font-family: 'Rajdhani', Arial, sans-serif; min-height: 1.2em;
+        }
+
+        /* Points Section */
+        .points-section {
+            padding: 15px; margin-bottom: 20px;
+            background: rgba(168,85,247,0.08);
+            border: 1px solid rgba(168,85,247,0.2); border-radius: 8px;
+        }
+        .points-info { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .points-badge { font-family: 'Orbitron', sans-serif; font-size: 0.8rem; color: #a855f7; font-weight: 700; }
+        .points-value-fcfa { font-size: 0.85rem; color: #4CAF50; }
+        .btn-use-points {
+            width: 100%; padding: 10px;
+            background: linear-gradient(135deg, #7c3aed, #a855f7);
+            border: none; border-radius: 6px; color: #fff;
+            font-family: 'Orbitron', sans-serif; font-size: 0.75rem;
+            font-weight: 700; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-use-points:hover { transform: translateY(-1px); box-shadow: 0 0 15px rgba(168,85,247,0.4); }
+        .discount-applied {
+            margin-top: 10px; padding: 10px; background: rgba(76,175,80,0.1);
+            border-radius: 6px; color: #4CAF50; font-size: 0.85rem; text-align: center;
+        }
+        .btn-cancel-points {
+            width: 100%; margin-top: 8px; padding: 8px; background: transparent;
+            border: 1px solid rgba(255,34,68,0.3); border-radius: 6px;
+            color: #ff2244; font-size: 0.8rem; cursor: pointer;
+        }
+        .btn-cancel-points:hover { background: rgba(255,34,68,0.1); }
+
+        .btn-payer {
+            width: 100%; padding: 18px;
+            background: linear-gradient(135deg, #ff2244 0%, #a855f7 100%);
+            color: white; border: none; border-radius: 8px;
+            font-size: 1.1em; font-weight: bold; font-family: 'Orbitron', Arial, sans-serif;
+            text-transform: uppercase; letter-spacing: 1px;
+            cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(255,34,68,0.3);
+        }
+        .btn-payer:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,34,68,0.6); }
+        .btn-payer:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        #loading-message {
+            text-align: center; color: #4CAF50; margin-top: 20px;
+            font-weight: bold; display: none; font-family: 'Rajdhani', Arial, sans-serif;
+            animation: pulse 1.5s infinite;
+        }
+        #error-message {
+            color: #ff4c4c; text-align: center; margin-top: 15px; display: none;
+            padding: 12px; background: rgba(255,76,76,0.1);
+            border-left: 4px solid #ff4c4c; border-radius: 6px;
+            font-family: 'Rajdhani', Arial, sans-serif;
+        }
+        .success-message {
+            color: #4CAF50; text-align: center; margin-top: 15px; display: none;
+            padding: 12px; background: rgba(76,175,80,0.1);
+            border-left: 4px solid #4CAF50; border-radius: 6px;
+            font-family: 'Rajdhani', Arial, sans-serif;
+        }
+
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+
+        .spinner {
+            display: inline-block; width: 20px; height: 20px;
+            border: 3px solid rgba(255,34,68,0.3); border-radius: 50%;
+            border-top-color: #ff2244; animation: spin 0.8s linear infinite;
+            margin-right: 8px; vertical-align: middle;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .footer {
+            text-align: center; margin-top: 30px; color: #666;
+            font-size: 0.85em; font-family: 'Rajdhani', Arial, sans-serif;
+        }
+        .footer a { color: #ff2244; text-decoration: none; transition: color 0.3s; }
+        .footer a:hover { color: #a855f7; }
+
+        /* Category separators */
+        .pack-category {
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem;
+            color: #a855f7; text-transform: uppercase; letter-spacing: 2px;
+            padding: 8px 0; margin-top: 5px; border-top: 1px solid rgba(168,85,247,0.2);
+        }
+
+        @media (max-width: 600px) {
+            .header h1 { font-size: 2em; }
+            .recharge-card { padding: 25px; }
+            .id-row { flex-direction: column; }
+            .btn-verifier { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔥 KELLY GAMING</h1>
+            <p>Recharge automatique PUBG Mobile</p>
+        </div>
+
+        <div class="recharge-card">
+            <div class="info-box">
+                ⚡ <strong>Paiement instantané</strong> — Recharge livrée automatiquement en &lt; 5 minutes
+            </div>
+
+            <form id="rechargeForm">
+                <!-- Player ID + Bouton Vérifier -->
+                <div class="form-group">
+                    <label for="playerId">🎯 PLAYER ID (UID)</label>
+                    <div class="id-row">
+                        <input type="text" id="playerId" placeholder="Ex: 5123456789" required maxlength="20">
+                        <button type="button" id="btnVerifier" class="btn-verifier" onclick="verifierID()">🔍 Vérifier</button>
+                    </div>
+                    <div id="resultatValidation"></div>
+                </div>
+
+                <!-- Sélection du package -->
+                <div class="form-group">
+                    <label for="packageSelect">💎 CHOISIR VOTRE PACKAGE</label>
+                    <select id="packageSelect" required>
+                        <option value="">-- Choisir votre package --</option>
+                        <optgroup label="── 💰 UC (Unknown Cash) ──">
+                            <option value="pubg_60">60 UC - 850 FCFA</option>
+                            <option value="pubg_325">325 UC - 3200 FCFA</option>
+                            <option value="pubg_660">660 UC - 6000 FCFA</option>
+                            <option value="pubg_985">985 UC - 8500 FCFA</option>
+                            <option value="pubg_1320">1320 UC - 11200 FCFA</option>
+                            <option value="pubg_1800">1800 UC - 13700 FCFA</option>
+                        </optgroup>
+                        <optgroup label="── 🎁 PACKS SPÉCIAUX ──">
+                            <option value="pubg_first">Premier Achat Pack - 800 FCFA</option>
+                            <option value="pubg_weekly1">Weekly Deadly Pack 1 - 800 FCFA</option>
+                            <option value="pubg_weekly2">Weekly Deadly Pack 2 - 2000 FCFA</option>
+                        </optgroup>
+                        <optgroup label="── ⭐ PRIME ──">
+                            <option value="pubg_prime1">Prime 1 Mois - 800 FCFA</option>
+                            <option value="pubg_prime3">Prime 3 Mois - 2000 FCFA</option>
+                            <option value="pubg_prime6">Prime 6 Mois - 3500 FCFA</option>
+                        </optgroup>
+                        <optgroup label="── 🏆 ELITE / ROYALE PASS ──">
+                            <option value="pubg_rp50">Elite Pass Lvl 1-50 - 3800 FCFA</option>
+                            <option value="pubg_rp100">Elite Pass Lvl 1-100 - 7000 FCFA</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Section Points de Fidélité -->
+                <div class="points-section" id="pointsSection" style="display:none;">
+                    <div class="points-info">
+                        <span class="points-badge">💎 <span id="pointsAvailable">0</span> points</span>
+                        <span class="points-value-fcfa">= <span id="pointsValueFcfa">0</span> FCFA de réduction</span>
+                    </div>
+                    <button type="button" class="btn-use-points" id="btnUsePoints" onclick="togglePoints()">
+                        🎁 Utiliser mes points
+                    </button>
+                    <div id="discountInfo" style="display:none;">
+                        <div class="discount-applied">
+                            ✅ Réduction de <span id="discountAmount">0</span> FCFA appliquée!
+                            <br><small>Nouveau prix: <strong id="newPrice">0</strong> FCFA</small>
+                        </div>
+                        <button type="button" class="btn-cancel-points" onclick="cancelPoints()">❌ Annuler la réduction</button>
+                    </div>
+                </div>
+
+                <!-- Bouton Paiement (DÉSACTIVÉ par défaut) -->
+                <button type="submit" class="btn-payer" id="btnPayer" disabled style="opacity: 0.5; cursor: not-allowed;">
+                    💳 PROCÉDER AU PAIEMENT
+                </button>
+
+                <div id="loading-message"><span class="spinner"></span>Génération du lien sécurisé...</div>
+                <div id="error-message"></div>
+                <div class="success-message" id="success-message">✅ Redirection vers le paiement sécurisé...</div>
+            </form>
+        </div>
+
+        <div class="footer">
+            <p>💬 Support: <a href="https://wa.me/message/COVDTCVHRPF4F1" target="_blank">WhatsApp</a> — 🎮 Site: <a href="https://kellygame.shop" target="_blank">Kelly Gaming</a></p>
+            <p style="margin-top: 10px; font-size: 0.8em;">Paiement sécurisé via Money Fusion • Livraison automatique</p>
+        </div>
+    </div>
+
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // VÉRIFICATION D'ID (SANITY CHECK)
+        // ═══════════════════════════════════════════════════════════════
+        async function verifierID() {
+            const playerId = document.getElementById('playerId').value.trim();
+            const resultatDiv = document.getElementById('resultatValidation');
+            const btnPayer = document.getElementById('btnPayer');
+            const btnVerifier = document.getElementById('btnVerifier');
+
+            if (!playerId) {
+                resultatDiv.style.color = '#ff2244';
+                resultatDiv.innerText = "❌ Veuillez entrer un ID joueur d'abord.";
+                return;
+            }
+
+            resultatDiv.style.color = '#888899';
+            resultatDiv.innerText = '⏳ Vérification en cours...';
+            btnVerifier.disabled = true;
+            btnPayer.disabled = true;
+            btnPayer.style.opacity = '0.5';
+            btnPayer.style.cursor = 'not-allowed';
+
+            try {
+                const response = await fetch('https://telegram-g2bulk-bot.vercel.app/api/pay?action=validate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        cleJeu: 'pubgm',
+                        playerId: playerId
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.valid === 'valid') {
+                    resultatDiv.style.color = '#00ff00';
+                    resultatDiv.innerText = '✅ Joueur trouvé : ' + data.name;
+                    btnPayer.disabled = false;
+                    btnPayer.style.opacity = '1';
+                    btnPayer.style.cursor = 'pointer';
+                } else {
+                    resultatDiv.style.color = '#ff2244';
+                    resultatDiv.innerText = '❌ Vérification impossible. Vérifie ton ID puis réessaie.';
+                }
+            } catch (error) {
+                resultatDiv.style.color = '#ff2244';
+                resultatDiv.innerText = '❌ Erreur de connexion au serveur.';
+            }
+
+            btnVerifier.disabled = false;
+        }
+
+        function resetValidation() {
+            document.getElementById('resultatValidation').innerText = '';
+            const btnPayer = document.getElementById('btnPayer');
+            btnPayer.disabled = true;
+            btnPayer.style.opacity = '0.5';
+            btnPayer.style.cursor = 'not-allowed';
+        }
+
+        document.getElementById('playerId').addEventListener('input', resetValidation);
+
+        // ═══════════════════════════════════════════════════════════════
+        // GESTION DU FORMULAIRE DE PAIEMENT
+        // ═══════════════════════════════════════════════════════════════
+        document.getElementById('rechargeForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const playerId = document.getElementById('playerId').value.trim();
+            const packageId = document.getElementById('packageSelect').value;
+            const btnPayer = document.getElementById('btnPayer');
+            const loadingMessage = document.getElementById('loading-message');
+            const errorMessage = document.getElementById('error-message');
+            const successMessage = document.getElementById('success-message');
+
+            if (!playerId || !packageId) {
+                errorMessage.textContent = '❌ Veuillez remplir tous les champs';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            btnPayer.disabled = true;
+            loadingMessage.style.display = 'block';
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            try {
+                // ✅ SI UTILISATION DE POINTS: déduire d'abord
+                let discountApplied = 0;
+                if (usingPoints && pointsToUse > 0) {
+                    const savedUser = JSON.parse(localStorage.getItem('kellyUser') || '{}');
+                    if (savedUser.email) {
+                        try {
+                            const spendRes = await fetch('https://kellygame.shop/api/points?action=spend', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    email: savedUser.email,
+                                    amount: pointsToUse,
+                                    description: 'Réduction achat PUBG Mobile'
+                                })
+                            });
+                            const spendData = await spendRes.json();
+                            if (spendData.success) {
+                                discountApplied = pointsToUse;
+                            }
+                        } catch(e) {
+                            console.error('[POINTS] Erreur déduction:', e);
+                        }
+                    }
+                }
+
+                const response = await fetch('https://telegram-g2bulk-bot.vercel.app/api/pay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        playerId: playerId,
+                        cleJeu: 'pubgm',
+                        idPackage: packageId,
+                        discount: discountApplied
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.freeOrder && data.success) {
+                    const packageText = document.getElementById('packageSelect').options[document.getElementById('packageSelect').selectedIndex].text;
+                    localStorage.setItem('lastPurchase', JSON.stringify({
+                        game: 'PUBG Mobile',
+                        gameEmoji: '🎯',
+                        package: packageText,
+                        playerId: playerId,
+                        timestamp: new Date().toISOString()
+                    }));
+                    successMessage.style.display = 'block';
+                    loadingMessage.style.display = 'none';
+                    setTimeout(() => { window.location.href = '/success.html'; }, 1500);
+                } else if (response.ok && data.url) {
+                    const packageText = document.getElementById('packageSelect').options[document.getElementById('packageSelect').selectedIndex].text;
+                    localStorage.setItem('lastPurchase', JSON.stringify({
+                        game: 'PUBG Mobile',
+                        gameEmoji: '🎯',
+                        package: packageText,
+                        playerId: playerId,
+                        timestamp: new Date().toISOString()
+                    }));
+                    successMessage.style.display = 'block';
+                    loadingMessage.style.display = 'none';
+                    setTimeout(() => { window.location.href = data.url; }, 1500);
+                } else {
+                    throw new Error(data.error || 'Erreur lors de la génération du lien');
+                }
+            } catch (error) {
+                errorMessage.textContent = '❌ ' + error.message;
+                errorMessage.style.display = 'block';
+                loadingMessage.style.display = 'none';
+                btnPayer.disabled = false;
+            }
+        });
+
+        document.getElementById('playerId').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') { e.preventDefault(); document.getElementById('packageSelect').focus(); }
+        });
+
+        // ═══════════════════════════════════════════════════════════════
+        // SYSTÈME DE POINTS DE FIDÉLITÉ
+        // ═══════════════════════════════════════════════════════════════
+        let userPoints = 0;
+        let usingPoints = false;
+        let pointsToUse = 0;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('kellyUser');
+            if (savedUser) {
+                try {
+                    const user = JSON.parse(savedUser);
+                    if (user.email && user.points > 0) {
+                        userPoints = user.points;
+                        document.getElementById('pointsAvailable').textContent = userPoints;
+                        document.getElementById('pointsValueFcfa').textContent = userPoints;
+                        document.getElementById('pointsSection').style.display = 'block';
+                    }
+                    if (user.email) {
+                        fetch('https://kellygame.shop/api/points?action=get&email=' + encodeURIComponent(user.email))
+                        .then(r => r.json())
+                        .then(data => {
+                            if (data.success && data.points > 0) {
+                                userPoints = data.points;
+                                document.getElementById('pointsAvailable').textContent = userPoints;
+                                document.getElementById('pointsValueFcfa').textContent = userPoints;
+                                document.getElementById('pointsSection').style.display = 'block';
+                            }
+                        }).catch(() => {});
+                    }
+                } catch(e) {}
+            }
+        });
+
+        function getSelectedPrice() {
+            const sel = document.getElementById('packageSelect');
+            if (!sel || !sel.value) return 0;
+            const text = sel.options[sel.selectedIndex].text;
+            const match = text.match(/(\d[\d\s]*)\s*FCFA/);
+            return match ? parseInt(match[1].replace(/\s/g, ''), 10) : 0;
+        }
+
+        function togglePoints() {
+            const price = getSelectedPrice();
+            if (price <= 0) { alert("Sélectionne d'abord un package!"); return; }
+            pointsToUse = Math.min(userPoints, price);
+            usingPoints = true;
+            document.getElementById('discountAmount').textContent = pointsToUse;
+            const remaining = price - pointsToUse;
+            document.getElementById('newPrice').textContent = remaining <= 0 ? '0 (GRATUIT! 🎉)' : remaining;
+            document.getElementById('discountInfo').style.display = 'block';
+            document.getElementById('btnUsePoints').style.display = 'none';
+        }
+
+        function cancelPoints() {
+            usingPoints = false;
+            pointsToUse = 0;
+            document.getElementById('discountInfo').style.display = 'none';
+            document.getElementById('btnUsePoints').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

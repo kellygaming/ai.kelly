@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Paiement – Kellyyt Gaming</title>
+<script>
+  // Redirection automatique vers la page d'accueil
+  window.location.href = '/';
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --red: #ff2244; --red-dark: #cc0033;
+    --purple: #7c3aed; --purple-light: #a855f7;
+    --bg: #07070d; --bg2: #0e0e1a; --bg3: #13131f;
+    --border: rgba(255,255,255,0.07); --border-red: rgba(255,34,68,0.3);
+    --text: #e8e8f0; --muted: #888899; --green: #4ade80;
+    --font-head: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+  }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 2rem 1rem 200px;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none; z-index: 0;
+  }
+
+  /* ── HEADER ── */
+  .page-header {
+    width: 100%; max-width: 560px;
+    display: flex; align-items: center;
+    gap: 12px; margin-bottom: 2rem;
+    position: relative; z-index: 10;
+  }
+  .page-header img {
+    height: 46px; width: 46px;
+    border-radius: 10px; object-fit: cover;
+  }
+  .page-header .logo-text {
+    font-family: var(--font-head);
+    font-size: 1.1rem; font-weight: 900; letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--red), var(--purple-light));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .page-header a {
+    margin-left: auto;
+    font-family: var(--font-body);
+    font-size: 0.82rem; font-weight: 600;
+    color: var(--muted); text-decoration: none;
+    letter-spacing: 1px; text-transform: uppercase;
+    transition: color .2s;
+  }
+  .page-header a:hover { color: var(--red); }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--bg2);
+    border: 2px solid var(--red);
+    width: 100%; max-width: 560px;
+    padding: 2.5rem 2.5rem;
+    position: relative; z-index: 10;
+    clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+    margin-top: 2rem;
+    box-shadow: 0 0 40px rgba(255,34,68,0.2);
+  }
+  .card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--red), var(--purple));
+  }
+
+  .card-title {
+    font-family: var(--font-head);
+    font-size: 1rem; font-weight: 900;
+    text-transform: uppercase; letter-spacing: 2px;
+    margin-bottom: 0.3rem;
+  }
+  .card-sub {
+    font-size: 0.88rem; color: var(--muted);
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ── FORM ── */
+  .form-group { margin-bottom: 1.4rem; }
+
+  label {
+    display: block;
+    font-family: var(--font-head);
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.5rem;
+  }
+  label .req { color: var(--red); }
+
+  input[type="text"],
+  input[type="tel"],
+  input[type="email"],
+  select {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    font-weight: 500;
+    padding: 13px 16px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  input:focus, select:focus {
+    border-color: var(--red);
+    box-shadow: 0 0 0 3px rgba(255,34,68,0.08);
+  }
+  input::placeholder { color: #444455; }
+
+  /* ── SELECT CUSTOM ── */
+  .select-wrap { position: relative; }
+  .select-wrap::after {
+    content: '▾';
+    position: absolute; right: 16px; top: 50%;
+    transform: translateY(-50%);
+    color: var(--red); pointer-events: none;
+    font-size: 1.1rem;
+  }
+  select option {
+    background: var(--bg3); color: var(--text);
+  }
+
+  /* ── PRICE PREVIEW ── */
+  .price-preview {
+    display: flex; align-items: center;
+    justify-content: space-between;
+    background: rgba(255,34,68,0.05);
+    border: 1px solid var(--border-red);
+    padding: 12px 16px;
+    margin-top: 0.6rem;
+  }
+  .price-preview .label { font-size: 0.82rem; color: var(--muted); }
+  .price-preview .amount {
+    font-family: var(--font-head);
+    font-size: 1.2rem; font-weight: 900;
+    color: var(--red);
+  }
+
+  /* ── GAME BADGE ── */
+  .game-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(124,58,237,0.1);
+    border: 1px solid rgba(124,58,237,0.25);
+    color: var(--purple-light);
+    font-size: 0.72rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 4px 12px; margin-top: 0.6rem;
+  }
+
+  /* ── SEPARATOR ── */
+  .separator {
+    border: none; border-top: 1px solid var(--border);
+    margin: 1.75rem 0;
+  }
+
+  /* ── SECURITY BADGES ── */
+  .security-row {
+    display: flex; gap: 0.6rem; flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+  }
+  .sec-badge {
+    display: flex; align-items: center; gap: 5px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--border);
+    padding: 5px 10px;
+    font-size: 0.72rem; color: var(--muted);
+    font-weight: 600; letter-spacing: 0.5px;
+  }
+
+  /* ── BUTTON ── */
+  .btn-pay {
+    width: 100%;
+    background: linear-gradient(135deg, var(--red), var(--red-dark));
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 0.82rem; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    padding: 18px;
+    border: none; cursor: pointer;
+    clip-path: polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%);
+    transition: filter .2s, transform .15s;
+    position: relative;
+  }
+  .btn-pay:hover:not(:disabled) { filter: brightness(1.12); transform: translateY(-1px); }
+  .btn-pay:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .btn-pay .spinner {
+    display: none;
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    margin: 0 auto;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .btn-pay.loading .btn-text { display: none; }
+  .btn-pay.loading .spinner { display: block; }
+
+  /* ── CGU CHECKBOX ── */
+  .cgu-section {
+    margin-bottom: 1.5rem;
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    cursor: pointer;
+    font-size: 0.9rem;
+    user-select: none;
+  }
+
+  .checkbox-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 2px;
+    cursor: pointer;
+    accent-color: #ff2244;
+    flex-shrink: 0;
+  }
+
+  .checkbox-label span {
+    line-height: 1.5;
+  }
+
+  .checkbox-label a {
+    color: #ff2244;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color .2s;
+  }
+
+  .checkbox-label a:hover {
+    color: #a855f7;
+    text-decoration: underline;
+  }
+
+  .cgu-warning {
+    background: rgba(255,34,68,0.1);
+    border: 1px solid #ff2244;
+    color: #ff6680;
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  /* ── ERROR ── */
+  .error-msg {
+    display: none;
+    background: rgba(255,34,68,0.08);
+    border: 1px solid rgba(255,34,68,0.3);
+    color: #ff6680;
+    font-size: 0.88rem; font-weight: 600;
+    padding: 12px 16px;
+    margin-top: 1rem;
+    text-align: center;
+  }
+  .error-msg.show { display: block; }
+
+  /* ── FOOTER NOTE ── */
+  .footer-note {
+    margin-top: 1.5rem; text-align: center;
+    font-size: 0.78rem; color: var(--muted); line-height: 1.7;
+  }
+  .footer-note a { color: var(--purple-light); text-decoration: none; }
+
+  /* ── UID ROW ── */
+  .uid-row {
+    display: flex; gap: 0.6rem; align-items: stretch;
+  }
+  .uid-row input {
+    flex: 1; margin: 0;
+  }
+  .btn-verify {
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--purple-light);
+    color: var(--purple-light);
+    font-family: var(--font-head);
+    font-size: 0.65rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 0 18px; cursor: pointer;
+    white-space: nowrap;
+    transition: background .2s, color .2s;
+    position: relative; min-width: 90px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-verify:hover:not(:disabled) {
+    background: var(--purple-light); color: #fff;
+  }
+  .btn-verify:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-verify.loading .verify-text { display: none; }
+  .btn-verify.loading .verify-spinner { display: block; }
+  .verify-spinner {
+    display: none; width: 14px; height: 14px;
+    border: 2px solid rgba(168,85,247,0.3);
+    border-top-color: var(--purple-light);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+
+  /* ── RÉSULTAT VÉRIFICATION ── */
+  .verify-result {
+    margin-top: 0.6rem;
+    padding: 10px 14px;
+    font-size: 0.9rem; font-weight: 600;
+    display: none; align-items: center; gap: 8px;
+  }
+  .verify-result.show { display: flex; }
+  .verify-result.success {
+    background: rgba(74,222,128,0.07);
+    border: 1px solid rgba(74,222,128,0.25);
+    color: var(--green);
+  }
+  .verify-result.error {
+    background: rgba(255,34,68,0.07);
+    border: 1px solid rgba(255,34,68,0.25);
+    color: #ff6680;
+  }
+  .verify-result.warning {
+    background: rgba(251,191,36,0.07);
+    border: 1px solid rgba(251,191,36,0.25);
+    color: #fbbf24;
+  }
+  .player-name {
+    font-family: var(--font-head);
+    font-size: 0.82rem; letter-spacing: 1px;
+    margin-left: 4px;
+  }
+
+  /* ── CONDITIONAL SECTIONS ── */
+  .form-section {
+    display: none;
+  }
+  .form-section.active {
+    display: block;
+  }
+
+  /* ── EMAIL WARNING ── */
+  .email-warning {
+    background: rgba(251,191,36,0.1);
+    border: 2px solid rgba(251,191,36,0.5);
+    color: #fbbf24;
+    padding: 1rem;
+    margin-top: 0.8rem;
+    border-radius: 6px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 1.6;
+  }
+  .email-warning strong {
+    color: #fde047;
+  }
+
+  @media (max-width: 600px) {
+    .card { padding: 1.75rem 1.25rem; }
+    .btn-verify { padding: 0 12px; font-size: 0.6rem; min-width: 75px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <img src="data:image/jpeg;base64," alt="Kellyyt Logo"/>
+  <span class="logo-text">KELLYGAME.SHOP</span>
+  <a href="/">← Retour boutique</a>
+</div>
+
+<div class="card">
+  <div class="card-title">🎮 Recharge de compte</div>
+  <div class="card-sub">Remplis le formulaire ci-dessous. Tu seras redirigé vers la page de paiement sécurisé.</div>
+
+  <form id="paymentForm" novalidate>
+
+    <!-- NOM -->
+    <div class="form-group">
+      <label>Nom complet <span class="req">*</span></label>
+      <input type="text" id="nomClient" placeholder="Ex : Jean Kouamé" required/>
+    </div>
+
+    <!-- TÉLÉPHONE -->
+    <div class="form-group">
+      <label>Numéro de téléphone Mobile Money <span class="req">*</span></label>
+      <input type="tel" id="numeroSend" placeholder="Ex : 07 00 00 00 00" required/>
+    </div>
+
+    <!-- PAYS -->
+    <div class="form-group">
+      <label>Votre Pays <span class="req">*</span></label>
+      <input type="text" id="paysClient" placeholder="Ex : Côte d'Ivoire, Maroc, Ghana..." required/>
+    </div>
+
+    <!-- ARTICLE -->
+    <div class="form-group">
+      <label>Article à recharger <span class="req">*</span></label>
+      <div class="select-wrap">
+        <select id="articleSelect" required>
+                    <optgroup label="🔥 Garena Free Fire">
+            <option value="Free Fire – 110 Jetons" data-prix="800" data-jeu="Free Fire">Free Fire – 110 Jetons (800 FCFA)</option>
+            <option value="Free Fire – 231 Jetons" data-prix="1700" data-jeu="Free Fire">Free Fire – 231 Jetons (1 700 FCFA)</option>
+            <option value="Free Fire – 341 Jetons" data-prix="2500" data-jeu="Free Fire">Free Fire – 341 Jetons (2 500 FCFA)</option>
+            <option value="Free Fire – 462 Jetons" data-prix="3200" data-jeu="Free Fire">Free Fire – 462 Jetons (3 200 FCFA)</option>
+            <option value="Free Fire – 583 Jetons" data-prix="3700" data-jeu="Free Fire">Free Fire – 583 Jetons (3 700 FCFA)</option>
+            <option value="Free Fire – 814 Jetons" data-prix="5000" data-jeu="Free Fire">Free Fire – 814 Jetons (5 000 FCFA)</option>
+            <option value="Free Fire – 1 045 Jetons" data-prix="6600" data-jeu="Free Fire">Free Fire – 1 045 Jetons (6 600 FCFA)</option>
+            <option value="Free Fire – 1 771 Jetons" data-prix="10200" data-jeu="Free Fire">Free Fire – 1 771 Jetons (10 200 FCFA)</option>
+            <option value="Free Fire – 2 420 Jetons" data-prix="13500" data-jeu="Free Fire">Free Fire – 2 420 Jetons (13 500 FCFA)</option>
+            <option value="Free Fire – Abonnement Semaine" data-prix="1800" data-jeu="Free Fire">Free Fire – Abonnement Semaine (1 800 FCFA)</option>
+            <option value="Free Fire – Abonnement Mois" data-prix="7300" data-jeu="Free Fire">Free Fire – Abonnement Mois (7 300 FCFA)</option>
+            <option value="Free Fire – Abonnement Mois + Semaine" data-prix="9100" data-jeu="Free Fire">Free Fire – Abonnement Mois + Semaine (9 100 FCFA)</option>
+          </optgroup>
+          <optgroup label="🌐 Roblox">
+            <option value="Roblox – 800 Robux"    data-prix="6000"   data-jeu="Roblox">Roblox – 800 Robux (6 000 FCFA)</option>
+            <option value="Roblox – 1 600 Robux"   data-prix="11900"  data-jeu="Roblox">Roblox – 1 600 Robux (11 900 FCFA)</option>
+            <option value="Roblox – 2 000 Robux"   data-prix="15000"  data-jeu="Roblox">Roblox – 2 000 Robux (15 000 FCFA)</option>
+            <option value="Roblox – 2 800 Robux"  data-prix="20800" data-jeu="Roblox">Roblox – 2 800 Robux (20 800 FCFA)</option>
+            <option value="Roblox – 4 500 Robux"  data-prix="30000" data-jeu="Roblox">Roblox – 4 500 Robux (30 000 FCFA)</option>
+            <option value="Roblox – 10 000 Robux"  data-prix="60000" data-jeu="Roblox">Roblox – 10 000 Robux (60 000 FCFA)</option>
+          </optgroup>
+          <optgroup label="🎯 PUBG Mobile">
+            <option value="PUBG Mobile – 60 UC"    data-prix="800"   data-jeu="PUBG Mobile">PUBG Mobile – 60 UC (800 FCFA)</option>
+            <option value="PUBG Mobile – First Pack"   data-prix="950"  data-jeu="PUBG Mobile">PUBG Mobile – First Pack (950 FCFA)</option>
+            <option value="PUBG Mobile – 325 UC"   data-prix="3200"  data-jeu="PUBG Mobile">PUBG Mobile – 325 UC (3 200 FCFA)</option>
+            <option value="PUBG Mobile – 660 UC"   data-prix="5900"  data-jeu="PUBG Mobile">PUBG Mobile – 660 UC (5 900 FCFA)</option>
+            <option value="PUBG Mobile – 985 UC"  data-prix="9000" data-jeu="PUBG Mobile">PUBG Mobile – 985 UC (9 000 FCFA)</option>
+          </optgroup>
+          <optgroup label="⚡ Bloodstrike">
+            <option value="Bloodstrike – 51 GC Coins"   data-prix="400"   data-jeu="Bloodstrike">Bloodstrike – 51 GC (400 FCFA)</option>
+            <option value="Bloodstrike – 105 GC Coins"   data-prix="1000"  data-jeu="Bloodstrike">Bloodstrike – 105 GC (1 000 FCFA)</option>
+            <option value="Bloodstrike – 320 GC Coins"  data-prix="2300"  data-jeu="Bloodstrike">Bloodstrike – 320 GC (2 300 FCFA)</option>
+            <option value="Bloodstrike – 540 GC Coins"  data-prix="3500"  data-jeu="Bloodstrike">Bloodstrike – 540 GC (3 500 FCFA)</option>
+            <option value="Bloodstrike – 860 GC Coins"  data-prix="5700"  data-jeu="Bloodstrike">Bloodstrike – 860 GC ⭐ (5 700 FCFA)</option>
+            <option value="Bloodstrike – 1 100 GC Coins"  data-prix="6100"  data-jeu="Bloodstrike">Bloodstrike – 1 100 GC (6 100 FCFA)</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <!-- Preview prix dynamique -->
+      <div class="price-preview" id="pricePreview">
+        <span class="label">Montant à payer</span>
+        <span class="amount" id="priceDisplay">500 FCFA</span>
+      </div>
+      <div class="game-tag" id="gameTag">🔥 Free Fire</div>
+    </div>
+
+    <!-- EMAIL -->
+    <div class="form-group form-section" id="emailSection">
+      <label>Email <span class="req">*</span></label>
+      <input type="email" id="emailClient" placeholder="ton@email.com"/>
+      <div class="email-warning">
+        ⚠️ <strong>TRÈS IMPORTANT :</strong> Cet email sera utilisé pour vous envoyer votre code numérique et les instructions pour l'échanger.
+      </div>
+    </div>
+
+    <!-- UID + VÉRIFICATION (Free Fire, Bloodstrike, PUBG) -->
+    <div class="form-group form-section active" id="uidSection">
+      <label>UID Joueur <span class="req">*</span></label>
+      <div class="uid-row">
+        <input type="text" id="uidJoueur" placeholder="Ton identifiant en jeu (UID/ID)" required autocomplete="off"/>
+        <button type="button" class="btn-verify" id="btnVerify" style="display:flex;">
+          <span class="verify-text">Vérifier</span>
+          <div class="verify-spinner"></div>
+        </button>
+      </div>
+      <!-- Résultat de la vérification -->
+      <div class="verify-result" id="verifyResult"></div>
+    </div>
+
+    <hr class="separator"/>
+
+    <!-- SÉCURITÉ -->
+    <div class="security-row">
+      <div class="sec-badge">🔒 SSL sécurisé</div>
+      <div class="sec-badge">💳 Money Fusion</div>
+      <div class="sec-badge">⚡ Livraison < 5 min</div>
+    </div>
+
+    <!-- ACCEPTATION CGU -->
+    <div class="cgu-section">
+      <label class="checkbox-label">
+        <input type="checkbox" id="acceptCGU" required/>
+        <span>J'accepte les <a href="/cgu-part1.html" target="_blank">Conditions Générales d'Utilisation</a></span>
+      </label>
+      <div class="cgu-warning" id="cguWarning" style="display:none;">
+        ⚠️ Vous devez accepter les conditions d'utilisation pour continuer.
+      </div>
+    </div>
+
+    <!-- BOUTON -->
+    <button type="submit" class="btn-pay" id="submitBtn">
+      <span class="btn-text">🔐 Payer maintenant</span>
+      <div class="spinner"></div>
+    </button>
+
+    <div class="error-msg" id="errorMsg">❌ Une erreur est survenue. Vérifie ta connexion et réessaie.</div>
+  </form>
+
+  <div class="footer-note">
+    En payant tu acceptes nos <a href="/cgu-part1.html" target="_blank">conditions d'utilisation</a>.<br/>
+    Problème ? Contacte notre <a href="/contact.html">support 24/7</a>.
+  </div>
+</div>
+
+<script>
+  // ── WEBHOOK URL (à remplacer par ton vrai lien Make) ──────
+  const VERIFY_WEBHOOK   = "https://hook.eu2.make.com/xk1chyc4cx501wpvnxoajdgxjet3qrn8";
+  const PAYMENT_WEBHOOK  = "https://hook.eu2.make.com/1959lvjootxs3e7pib7cfdpvvc49b4cs"; // Webhook Make - Notifie après paiement
+
+  const btnVerify   = document.getElementById('btnVerify');
+  const verifyRes   = document.getElementById('verifyResult');
+  const uidInput    = document.getElementById('uidJoueur');
+  let   uidVerified = false; // Garde en mémoire si l'UID est validé
+
+  // Réinitialiser la vérification si l'UID change
+  uidInput.addEventListener('input', () => {
+    uidVerified = false;
+    verifyRes.className = 'verify-result';
+    verifyRes.innerHTML = '';
+    verifyRes.classList.remove('show');
+  });
+
+  btnVerify.addEventListener('click', async () => {
+    const uid = uidInput.value.trim();
+    if (!uid) {
+      showVerifyResult('warning', '⚠️', 'Entre d\'abord ton UID.');
+      return;
+    }
+
+    // UI loading
+    btnVerify.classList.add('loading');
+    btnVerify.disabled = true;
+    verifyRes.classList.remove('show');
+
+    try {
+      const selEl  = document.getElementById('articleSelect');
+      const jeu    = selEl.options[selEl.selectedIndex].getAttribute('data-jeu');
+      const payload = JSON.stringify({ uid: uid, jeu: jeu });
+
+      console.log('[Kellyyt] Envoi vérification →', VERIFY_WEBHOOK, payload);
+
+      const res  = await fetch(VERIFY_WEBHOOK, {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    payload
+      });
+
+      const data = await res.json();
+      console.log('[Kellyyt] Réponse Make →', data);
+
+      if (data.valid === true && data.playerName) {
+        uidVerified = true;
+        showVerifyResult('success', '✅', 'ID confirmé — Joueur : <span class="player-name">' + data.playerName + '</span>');
+      } else {
+        uidVerified = false;
+        showVerifyResult('error', '❌', data.message || 'ID introuvable. Vérifie et réessaie.');
+      }
+    } catch (err) {
+      console.error('[Kellyyt] Erreur webhook vérification :', err);
+      uidVerified = true; // On ne bloque pas si le webhook est down
+      showVerifyResult('warning', '⚠️', 'Vérification indisponible — tu peux continuer.');
+    }
+
+    btnVerify.classList.remove('loading');
+    btnVerify.disabled = false;
+  });
+
+  function showVerifyResult(type, icon, message) {
+    verifyRes.className = `verify-result ${type} show`;
+    verifyRes.innerHTML = `<span>${icon}</span><span>${message}</span>`;
+  }
+
+  const select    = document.getElementById('articleSelect');
+  const priceDisp = document.getElementById('priceDisplay');
+  const gameTag   = document.getElementById('gameTag');
+  const form      = document.getElementById('paymentForm');
+  const btn       = document.getElementById('submitBtn');
+  const errorMsg  = document.getElementById('errorMsg');
+  const acceptCGU = document.getElementById('acceptCGU');
+  const cguWarning = document.getElementById('cguWarning');
+
+  // Sections conditionnelles
+  const uidSection = document.getElementById('uidSection');
+  const emailSection = document.getElementById('emailSection');
+
+  // Masquer le warning CGU quand l'utilisateur coche la checkbox
+  acceptCGU.addEventListener('change', function() {
+    if (this.checked) {
+      cguWarning.style.display = 'none';
+    }
+  });
+
+  const gameEmojis = {
+    'Free Fire': '🔥',
+    'Roblox': '🌐',
+    'PUBG Mobile': '🎯',
+    'Bloodstrike': '⚡',
+    'Fortnite': '💎'
+  };
+
+  // Fonction pour mettre à jour les champs visibles selon le jeu
+  function updateVisibleFields() {
+    const opt = select.options[select.selectedIndex];
+    const jeu = opt.getAttribute('data-jeu');
+    const emailInput = document.getElementById('emailClient');
+
+    // Réinitialiser les états
+    uidSection.classList.remove('active');
+    emailSection.classList.remove('active');
+    btnVerify.style.display = 'flex';
+
+    if (jeu === 'Free Fire') {
+      // Free Fire: Affiche UID + Bouton Vérifier
+      uidSection.classList.add('active');
+      uidInput.required = true;
+      emailInput.required = false;
+      btnVerify.style.display = 'flex';
+    } else if (jeu === 'Bloodstrike' || jeu === 'PUBG Mobile') {
+      // Bloodstrike & PUBG: Affiche UID, Masque Vérifier
+      uidSection.classList.add('active');
+      uidInput.required = true;
+      emailInput.required = false;
+      btnVerify.style.display = 'none';
+    } else {
+      // Autres (Roblox, Fortnite, etc.): Affiche Email
+      emailSection.classList.add('active');
+      uidInput.required = false;
+      emailInput.required = true;
+    }
+  }
+
+  function updatePreview() {
+    const opt   = select.options[select.selectedIndex];
+    const prix  = parseInt(opt.getAttribute('data-prix'));
+    const jeu   = opt.getAttribute('data-jeu');
+    priceDisp.textContent = prix.toLocaleString('fr-FR') + ' FCFA';
+    const emoji = gameEmojis[jeu] || '🎮';
+    gameTag.textContent   = emoji + ' ' + jeu;
+    
+    // Mettre à jour les champs visibles
+    updateVisibleFields();
+  }
+
+  select.addEventListener('change', (e) => {
+    // Si le select est désactivé, empêcher le changement
+    if (select.disabled) {
+      e.preventDefault();
+      return false;
+    }
+    updatePreview();
+  });
+  updatePreview();
+
+  // ── Pré-sélection via paramètre URL (?jeu=...) ──
+  (function() {
+    const params  = new URLSearchParams(window.location.search);
+    const jeu = params.get('jeu');
+    const produit = params.get('produit');
+    const lock = params.get('lock');
+    
+    if (!jeu) return;
+    
+    const decodedJeu = decodeURIComponent(jeu).toLowerCase();
+    let productFound = false;
+    
+    // Chercher l'option qui correspond au jeu
+    for (let i = 0; i < select.options.length; i++) {
+      const opt = select.options[i];
+      const optJeu = opt.getAttribute('data-jeu');
+      
+      if (optJeu && optJeu.toLowerCase() === decodedJeu) {
+        // Si un produit spécifique est demandé, chercher cet article exact
+        if (produit && lock === '1') {
+          const decodedProduit = decodeURIComponent(produit).toLowerCase();
+          
+          // Chercher l'option qui correspond au produit exact
+          for (let j = i; j < select.options.length; j++) {
+            const nextOpt = select.options[j];
+            if (nextOpt.getAttribute('data-jeu') !== optJeu) break; // Fin du jeu
+            
+            // Comparer le texte de l'option avec le produit demandé
+            if (nextOpt.textContent.toLowerCase().includes(decodedProduit.split('(')[0].trim())) {
+              select.selectedIndex = j;
+              productFound = true;
+              
+              // BLOQUER LE SELECT
+              select.disabled = true;
+              select.style.opacity = '0.7';
+              select.style.cursor = 'not-allowed';
+              
+              // Ajouter un message visuel 🔒
+              const lockMsg = document.createElement('div');
+              lockMsg.style.fontSize = '0.85rem';
+              lockMsg.style.color = '#fbbf24';
+              lockMsg.style.marginTop = '0.5rem';
+              lockMsg.style.fontWeight = '600';
+              lockMsg.style.display = 'flex';
+              lockMsg.style.alignItems = 'center';
+              lockMsg.style.gap = '0.5rem';
+              lockMsg.innerHTML = '🔒 Produit sélectionné et verrouillé';
+              select.parentElement.appendChild(lockMsg);
+              
+              break;
+            }
+          }
+        }
+        
+        // Si le produit n'a pas été trouvé avec le lock, juste sélectionner le jeu
+        if (!productFound) {
+          select.selectedIndex = i;
+        }
+        break;
+      }
+    }
+    
+    // Mettre à jour l'affichage et les champs
+    updatePreview();
+  })();
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    errorMsg.classList.remove('show');
+
+    const nom     = document.getElementById('nomClient').value.trim();
+    const numero = document.getElementById('numeroSend').value.trim();
+    const pays    = document.getElementById('paysClient').value.trim();
+    const email   = document.getElementById('emailClient').value.trim();
+    const uid     = document.getElementById('uidJoueur').value.trim();
+    const opt     = select.options[select.selectedIndex];
+    const jeu     = opt.getAttribute('data-jeu');
+    const articleNom  = opt.value;
+    const articlePrix = parseInt(opt.getAttribute('data-prix'));
+
+    // Validation basique
+    if (!nom || !numero || !pays) {
+      errorMsg.textContent = '⚠️ Les champs nom, téléphone et pays sont obligatoires.';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    // Vérifications spécifiques selon le jeu
+    if (jeu === 'Free Fire') {
+      // Free Fire: UID obligatoire et doit être vérifié
+      if (!uid) {
+        errorMsg.textContent = '⚠️ Veuillez remplir votre UID joueur.';
+        errorMsg.classList.add('show');
+        return;
+      }
+      if (!uidVerified) {
+        errorMsg.textContent = '⚠️ Merci de vérifier ton UID joueur avant de payer.';
+        errorMsg.classList.add('show');
+        uidInput.focus();
+        uidInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+    } else if (jeu === 'Bloodstrike' || jeu === 'PUBG Mobile') {
+      // Bloodstrike & PUBG: UID obligatoire (PAS de vérification)
+      if (!uid) {
+        errorMsg.textContent = '⚠️ Veuillez remplir votre UID joueur.';
+        errorMsg.classList.add('show');
+        return;
+      }
+    } else {
+      // Autres jeux (Roblox, Fortnite): Email obligatoire
+      if (!email) {
+        errorMsg.textContent = '⚠️ Veuillez remplir votre adresse email.';
+        errorMsg.classList.add('show');
+        return;
+      }
+    }
+
+    // Vérifier l'acceptation des CGU
+    if (!acceptCGU.checked) {
+      cguWarning.style.display = 'block';
+      acceptCGU.focus();
+      acceptCGU.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // ═══ TRANSFORMATION DU NOM DU PRODUIT POUR MONEY FUSION ═══
+    // Ex: "Free Fire – 2 420 Jetons" → "CARTE CADEAU 2420"
+    // Ex: "Robux – 800" → "CARTE CADEAU 800"
+    const transformedArticleName = (function() {
+      // Extraire le nombre du articleNom
+      const numberMatch = articleNom.match(/(\d+)\s*(Jetons|Robux|V-Bucks|UC|GC)?/);
+      if (numberMatch) {
+        const number = numberMatch[1].replace(/\s/g, ''); // Retirer les espaces (ex: "2 420" → "2420")
+        return `CARTE CADEAU ${number}`;
+      }
+      return articleNom; // Si pas de nombre trouvé, garder le nom original
+    })();
+
+    const paymentData = {
+      totalPrice:    articlePrix,
+      article:       [{ [transformedArticleName]: articlePrix }],
+      numeroSend:    numero,
+      nomclient:     nom,
+      email:         email || 'N/A',
+      personal_Info: uid ? [{ "UID": uid, "Article": transformedArticleName }] : [{ "Article": transformedArticleName, "Email": email }],
+      return_url:    "https://kellyyt.com/success.html",
+      webhook_url:   "/api/webhook/moneyfusion"
+    };
+
+    // UI loading
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const response = await fetch("https://pay.moneyfusion.net/E_commerce/e01bcc2156cd33e2/pay/", {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(paymentData)
+      });
+
+      const data = await response.json();
+
+      if (data.statut && data.url) {
+              localStorage.setItem('kellyyt_transaction', JSON.stringify({
+          uid:       uid || 'N/A',
+          article:   transformedArticleName,
+          montant:   articlePrix,
+          devise:    "FCFA",
+          nom:       nom,
+          telephone: numero,
+          email:     email || 'N/A',
+          timestamp: new Date().toISOString()
+        }));
+
+        // Redirection vers Money Fusion
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.message || 'Statut invalide');
+      }
+    } catch (err) {
+      errorMsg.textContent = '❌ ' + (err.message === 'Failed to fetch' ? 'Erreur réseau. Vérifie ta connexion.' : 'Paiement impossible : ' + err.message);
+      errorMsg.classList.add('show');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  });
+</script>
+
+
+
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore.js"></script>
+
+<script>
+  // ═══ CONFIGURATION FIREBASE ═══
+  const firebaseConfig = {
+    apiKey: "AIzaSyAsK2xK3vQ9pR8tL5mN4oP1qR9sT2uV3wX",
+    authDomain: "kellyyt-gaming.firebaseapp.com",
+    projectId: "kellyyt-gaming",
+    storageBucket: "kellyyt-gaming.appspot.com",
+    messagingSenderId: "123456789012",
+    appId: "1:123456789012:web:abcdef1234567890"
+  };
+
+  // Initialiser Firebase
+  firebase.initializeApp(firebaseConfig);
+  const authPayment = firebase.auth();
+  const dbPayment = firebase.firestore();
+
+  // ═══ ENREGISTRER L'ACHAT DANS FIRESTORE ═══
+  async function savePurchaseToFirestore(purchaseData) {
+    try {
+      // Vérifier si l'utilisateur est connecté
+      const user = authPayment.currentUser;
+      if (!user) {
+        console.log('Utilisateur non connecté - achat non enregistré dans Firestore');
+        return;
+      }
+
+      // Ajouter l'achat au tableau purchases de l'utilisateur
+      await dbPayment.collection('users').doc(user.uid).update({
+        purchases: firebase.firestore.FieldValue.arrayUnion(purchaseData)
+      });
+
+      console.log('✅ Achat enregistré dans Firestore');
+    } catch (error) {
+      console.error('Erreur lors de l'enregistrement:', error);
+    }
+  }
+
+  // ═══ APPELER CETTE FONCTION APRÈS UN PAIEMENT RÉUSSI ═══
+  // Cette fonction sera appelée depuis le code principal de paiement
+</script>
+
+</body>
+</html>
