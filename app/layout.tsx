@@ -1,5 +1,6 @@
 import "./globals.css";
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/next";
 
 const SITE_URL = "https://kellygaming.tech";
 const TITLE = "KellyIA — L'IA gaming faite pour l'Afrique";
@@ -61,7 +62,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="font-body bg-bg text-text">{children}</body>
+      <body className="font-body bg-bg text-text">
+        {children}
+        <Analytics />
+      </body>
     </html>
   );
 }
