@@ -14,6 +14,8 @@ const VOICES = [
 export default function VoiceStudio() {
   const [text, setText] = useState("");
   const [voice, setVoice] = useState(VOICES[0].id);
+  const [suggesting, setSuggesting] = useState(false);
+  const [enhanced, setEnhanced] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "done" | "error">("idle");
   const [error, setError] = useState("");
   const [blockedReason, setBlockedReason] = useState<string | null>(null);
@@ -28,6 +30,30 @@ export default function VoiceStudio() {
       if (objectUrlRef.current) URL.revokeObjectURL(objectUrlRef.current);
     };
   }, []);
+
+  async function enhanceText() {
+    if (suggesting || !text.trim()) return;
+    setSuggesting(true);
+    setError("");
+    try {
+      const res = await fetch("/api/enhance-voice-text", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data?.error || "Impossible d'améliorer ce texte.");
+      } else {
+        setText(data.text);
+        setEnhanced(true);
+      }
+    } catch {
+      setError("Impossible de contacter le serveur.");
+    } finally {
+      setSuggesting(false);
+    }
+  }
 
   async function generate() {
     if (!text.trim() || status === "loading") return;
@@ -99,14 +125,38 @@ export default function VoiceStudio() {
       />
 
       <div className="studio-form">
+        <div className="studio-tips">
+          💡 Astuce : clique sur <strong>Améliorer le texte</strong> avant de générer — l'IA ajuste le
+          rythme et ajoute des nuances d'expressivité pour un rendu vocal plus naturel.
+        </div>
+
         <label className="studio-label">Texte à lire</label>
         <textarea
           value={text}
-          onChange={(e) => setText(e.target.value)}
+          onChange={(e) => {
+            setText(e.target.value);
+            setEnhanced(false);
+          }}
           placeholder="Colle ton script ici, l'IA le lira avec la voix choisie..."
           className="studio-textarea"
           rows={4}
         />
+
+        <button
+          type="button"
+          className={`enhance-btn ${enhanced ? "enhance-btn-done" : ""}`}
+          onClick={enhanceText}
+          disabled={!text.trim() || suggesting}
+        >
+          <span className="enhance-btn-shine" />
+          {suggesting ? (
+            "Amélioration en cours…"
+          ) : enhanced ? (
+            <>✓ Texte optimisé pour la voix</>
+          ) : (
+            <>✨ Améliorer le texte (optionnel)</>
+          )}
+        </button>
 
         <label className="studio-label studio-label-spaced">Choisis une voix</label>
         <div className="voice-grid">
@@ -133,7 +183,7 @@ export default function VoiceStudio() {
           {status === "loading" ? "Génération…" : <>✦ Générer la voix</>}
         </button>
 
-        {status === "error" && <p className="studio-error">⚠ {error}</p>}
+        {error && <p className="studio-error">⚠ {error}</p>}
       </div>
 
       <div className="studio-result studio-result-audio">
