@@ -618,6 +618,35 @@ export default function Home() {
         </div>
       </section>
 
+      {/* MODÈLE IA PRO 3.1 */}
+      <section className="model-section">
+        <div className="model-glow"></div>
+        <div className="model-inner reveal">
+          <div className="model-visual">
+            <div className="model-orbit">
+              <span className="model-orbit-ring ring-1"></span>
+              <span className="model-orbit-ring ring-2"></span>
+              <span className="model-core">3.1</span>
+            </div>
+          </div>
+          <div className="model-content">
+            <span className="eyebrow eyebrow-purple"><span className="eyebrow-dot dot-purple"></span>Exclusif offre Plus</span>
+            <h2 className="section-title">Débloque <span className="grad-text-2">KellyIA 3.1</span><br />notre modèle le plus intelligent</h2>
+            <p className="model-desc">
+              Des réponses plus précises, des sensis plus poussées, une analyse plus fine de chaque
+              situation de jeu — le modèle Pro 3.1 comprend mieux tes questions et donne de bien
+              meilleurs résultats que la version standard.
+            </p>
+            <ul className="model-features">
+              <li>🎯 Réponses plus précises et détaillées</li>
+              <li>⚡ Analyse plus fine des situations de jeu</li>
+              <li>🏆 Meilleurs résultats pour progresser vite</li>
+            </ul>
+            <a href="#tarifs" className="btn btn-primary">Passer au modèle Pro 3.1</a>
+          </div>
+        </div>
+      </section>
+
       {/* TARIFS / PAIEMENT LOCAL */}
       <section className="pricing-section" id="tarifs">
         <div className="pricing-glow"></div>
@@ -634,9 +663,10 @@ export default function Home() {
               <div className="price-amount">0 <small>FCFA</small></div>
               <p className="price-desc">Pour découvrir l'assistant au quotidien.</p>
               <ul className="price-list">
-                <li>20 messages de coaching / mois</li>
+                <li>3 messages de coaching / mois</li>
                 <li>3 miniatures / mois</li>
-                <li>2 générations voix / mois</li>
+                <li>1 génération voix / mois</li>
+                <li>Modèle IA standard</li>
                 <li>Historique 7 jours</li>
               </ul>
               <Link href="/chat" className="btn btn-ghost price-btn">Commencer</Link>
@@ -646,9 +676,10 @@ export default function Home() {
               <div className="price-amount">3 500 <small>FCFA / mois</small></div>
               <p className="price-desc">Pour les créateurs et joueurs réguliers.</p>
               <ul className="price-list">
-                <li>300 messages de coaching / mois</li>
+                <li>30 messages de coaching / mois</li>
                 <li>12 miniatures TikTok / YouTube / mois</li>
                 <li>8 générations voix / mois</li>
+                <li>Modèle IA Pro 3.1 — plus intelligent</li>
                 <li>Historique illimité</li>
               </ul>
               <button
@@ -787,7 +818,7 @@ export default function Home() {
               <span>La version gratuite suffit-elle ?</span>
               <span className="faq-plus">+</span>
             </button>
-            <div className="faq-a"><p>Oui pour un usage quotidien de coaching (20 messages/mois inclus). L'offre Plus monte à 300 messages, 12 miniatures et 8 générations voix par mois.</p></div>
+            <div className="faq-a"><p>La version gratuite permet de découvrir l'assistant (3 messages/mois, modèle IA standard). Pour un usage quotidien, l'offre Plus donne 30 messages, 12 miniatures et 8 générations voix par mois, avec notre modèle IA Pro 3.1, plus intelligent et plus performant.</p></div>
           </div>
           <div className="faq-item">
             <button className="faq-q">

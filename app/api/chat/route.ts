@@ -70,7 +70,7 @@ export async function POST(req: Request) {
             error:
               credit.plan === "plus"
                 ? "Crédits chat épuisés pour ce mois-ci."
-                : "Crédits chat gratuits épuisés — passe à l'offre Plus pour continuer.",
+                : "Crédits chat gratuits épuisés — passe à l'offre Plus pour continuer avec notre modèle IA Pro 3.1, plus intelligent et plus performant.",
             code: "no_credits",
           },
           { status: 402 }
