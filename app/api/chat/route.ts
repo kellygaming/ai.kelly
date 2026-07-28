@@ -3,6 +3,51 @@ import { checkAndConsumeCredit } from "@/lib/credits";
 
 export const runtime = "nodejs";
 
+type ChatMsg = { role: string; content: string };
+
+// Relaie un flux SSE (Anthropic ou DeepSeek/OpenAI) vers le client sous forme
+// de texte brut : chaque morceau de réponse arrive dès qu'il est généré, au
+// lieu d'attendre la réponse complète. `extractText` isole le texte selon le
+// format SSE propre à chaque fournisseur.
+function streamPlainText(body: ReadableStream<Uint8Array>, extractText: (parsed: any) => string | null) {
+  const reader = body.getReader();
+  const decoder = new TextDecoder();
+  const encoder = new TextEncoder();
+
+  return new ReadableStream({
+    async start(controller) {
+      let buffer = "";
+      try {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          buffer += decoder.decode(value, { stream: true });
+
+          const events = buffer.split("\n\n");
+          buffer = events.pop() || "";
+
+          for (const evt of events) {
+            const dataLine = evt.split("\n").find((l) => l.startsWith("data: "));
+            if (!dataLine) continue;
+            const raw = dataLine.slice(6);
+            if (raw === "[DONE]") continue;
+            try {
+              const text = extractText(JSON.parse(raw));
+              if (text) controller.enqueue(encoder.encode(text));
+            } catch {
+              // ligne non-JSON (keep-alive, etc.) : on ignore
+            }
+          }
+        }
+      } catch (streamErr) {
+        console.error("Erreur de streaming:", streamErr);
+      } finally {
+        controller.close();
+      }
+    },
+  });
+}
+
 export async function POST(req: Request) {
   try {
     const { messages } = await req.json();
@@ -34,13 +79,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Erreur de vérification des crédits." }, { status: 500 });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "Clé API manquante côté serveur (ANTHROPIC_API_KEY)." },
-        { status: 500 }
-      );
-    }
+    // Plan Plus → Claude (Anthropic), plan gratuit → DeepSeek : même
+    // comportement et même prompt côté utilisateur, seul le modèle change.
+    const usesClaude = credit.plan === "plus";
 
     // Date/heure réelles calculées à chaque requête (le modèle ne les connaît pas tout seul)
     const now = new Date();
@@ -72,70 +113,69 @@ Comment tu réponds :
 - Si on te pose une question hors gaming, aide quand même du mieux que tu peux — mais ton identité et ton expertise restent tournées vers le gaming et la création de contenu.
 - Réponds en français par défaut, sauf si la personne écrit dans une autre langue, auquel cas tu réponds dans cette langue.`;
 
-    const anthropicRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 2048,
-        system: SYSTEM_PROMPT,
-        stream: true,
-        messages: messages.map((m: { role: string; content: string }) => ({
-          role: m.role,
-          content: m.content,
-        })),
-      }),
-    });
+    const userMessages = messages.map((m: ChatMsg) => ({ role: m.role, content: m.content }));
 
-    if (!anthropicRes.ok || !anthropicRes.body) {
-      const errText = await anthropicRes.text().catch(() => "");
-      console.error("Erreur API Anthropic:", errText);
+    let providerRes: Response;
+
+    if (usesClaude) {
+      const apiKey = process.env.ANTHROPIC_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: "Clé API manquante côté serveur (ANTHROPIC_API_KEY)." },
+          { status: 500 }
+        );
+      }
+      providerRes = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": apiKey,
+          "anthropic-version": "2023-06-01",
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-5",
+          max_tokens: 2048,
+          system: SYSTEM_PROMPT,
+          stream: true,
+          messages: userMessages,
+        }),
+      });
+    } else {
+      const apiKey = process.env.DEEPSEEK_API_KEY;
+      if (!apiKey) {
+        return NextResponse.json(
+          { error: "Clé API manquante côté serveur (DEEPSEEK_API_KEY)." },
+          { status: 500 }
+        );
+      }
+      providerRes = await fetch("https://api.deepseek.com/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          max_tokens: 2048,
+          stream: true,
+          messages: [{ role: "system", content: SYSTEM_PROMPT }, ...userMessages],
+        }),
+      });
+    }
+
+    if (!providerRes.ok || !providerRes.body) {
+      const errText = await providerRes.text().catch(() => "");
+      console.error(`Erreur API ${usesClaude ? "Anthropic" : "DeepSeek"}:`, errText);
       return NextResponse.json({ error: "Erreur lors de l'appel à l'IA." }, { status: 502 });
     }
 
-    // On relaie le flux SSE d'Anthropic vers le client sous forme de texte
-    // brut : chaque morceau de réponse arrive dès qu'il est généré, au lieu
-    // d'attendre la réponse complète.
-    const reader = anthropicRes.body.getReader();
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-
-    const stream = new ReadableStream({
-      async start(controller) {
-        let buffer = "";
-        try {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-            buffer += decoder.decode(value, { stream: true });
-
-            const events = buffer.split("\n\n");
-            buffer = events.pop() || "";
-
-            for (const evt of events) {
-              const dataLine = evt.split("\n").find((l) => l.startsWith("data: "));
-              if (!dataLine) continue;
-              try {
-                const parsed = JSON.parse(dataLine.slice(6));
-                if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta") {
-                  controller.enqueue(encoder.encode(parsed.delta.text));
-                }
-              } catch {
-                // ligne non-JSON (keep-alive, etc.) : on ignore
-              }
-            }
-          }
-        } catch (streamErr) {
-          console.error("Erreur de streaming:", streamErr);
-        } finally {
-          controller.close();
-        }
-      },
-    });
+    const stream = usesClaude
+      ? streamPlainText(providerRes.body, (parsed) =>
+          parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta"
+            ? parsed.delta.text
+            : null
+        )
+      : streamPlainText(providerRes.body, (parsed) => parsed.choices?.[0]?.delta?.content ?? null);
 
     return new Response(stream, {
       headers: { "Content-Type": "text/plain; charset=utf-8" },
