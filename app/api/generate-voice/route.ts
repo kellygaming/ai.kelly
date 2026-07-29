@@ -6,6 +6,7 @@ export const runtime = "nodejs";
 // Chaque personnage de voix pointe vers une variable d'environnement contenant
 // le Voice ID ElevenLabs correspondant (à choisir dans la Voice Library).
 const VOICE_ENV_MAP: Record<string, string | undefined> = {
+  kelly_origine: process.env.ELEVENLABS_VOICE_KELLY_ORIGINE,
   kelly: process.env.ELEVENLABS_VOICE_KELLY,
   aicha: process.env.ELEVENLABS_VOICE_AICHA,
   yao: process.env.ELEVENLABS_VOICE_YAO,
