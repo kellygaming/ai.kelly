@@ -5,6 +5,7 @@ import { startUpgrade } from "@/lib/upgrade";
 import { signInWithGoogle } from "@/lib/auth";
 
 const VOICES = [
+  { id: "kelly_origine", name: "Kelly Origine Voix", tag: "Énergique · Homme", emoji: "🎙️" },
   { id: "kelly", name: "Kelly", tag: "Énergique · Homme", emoji: "🎙️" },
   { id: "aicha", name: "Aïcha", tag: "Dynamique · Femme", emoji: "🎤" },
   { id: "yao", name: "Yao", tag: "Narrateur posé · Homme", emoji: "🗣️" },
